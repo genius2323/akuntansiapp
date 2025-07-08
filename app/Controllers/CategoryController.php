@@ -14,8 +14,8 @@ class CategoryController extends BaseController
     {
         // Data lengkap untuk tombol-tombol klasifikasi
         $classifications = [
-            ['name' => 'Kategori', 'url' => 'categories', 'icon' => 'fas fa-tags', 'active' => true],
             ['name' => 'Satuan', 'url' => 'satuan', 'icon' => 'fas fa-ruler-combined', 'active' => false],
+            ['name' => 'Kategori', 'url' => 'categories', 'icon' => 'fas fa-tags', 'active' => true],
             ['name' => 'Jenis', 'url' => 'jenis', 'icon' => 'fas fa-boxes', 'active' => false],
             ['name' => 'Pelengkap', 'url' => 'pelengkap', 'icon' => 'fas fa-puzzle-piece', 'active' => false],
             ['name' => 'Gondola', 'url' => 'gondola', 'icon' => 'fas fa-store-alt', 'active' => false],
@@ -35,7 +35,7 @@ class CategoryController extends BaseController
 
         $data = [
             'title'           => 'Master Klasifikasi - Kategori',
-            'classifications' => $classifications, // Kirim data tombol ke view
+            'classifications' => $classifications,
             'categories'      => $this->getCategoryModel('default')->findAll()
         ];
         return view('categories/index', $data);

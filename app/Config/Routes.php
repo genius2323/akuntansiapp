@@ -64,6 +64,13 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
         $routes->put('categories/(:num)', 'CategoryController::update/$1');
         $routes->delete('categories/(:num)', 'CategoryController::delete/$1');
 
+        // Master Satuan (BARU)
+        $routes->get('satuan', 'SatuanController::index');
+        $routes->post('satuan/create', 'SatuanController::create');
+        $routes->get('satuan/(:num)/edit', 'SatuanController::edit/$1');
+        $routes->put('satuan/(:num)', 'SatuanController::update/$1');
+        $routes->delete('satuan/(:num)', 'SatuanController::delete/$1');
+
         // Master Produk
         $routes->get('products', 'ProductController::index');
         $routes->post('products/create', 'ProductController::create');
