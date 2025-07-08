@@ -18,21 +18,39 @@
         <div class="card">
             <div class="card-body">
                 <?php foreach ($classifications as $item): ?>
-                    <a href="<?= site_url($item['url']) ?>" 
-                       class="btn btn-app <?= $item['active'] ? 'bg-success' : 'bg-secondary' ?>">
+                    <a href="<?= site_url($item['url']) ?>"
+                        class="btn btn-app <?= $item['active'] ? 'bg-success' : 'bg-secondary' ?>">
                         <i class="<?= $item['icon'] ?>"></i> <?= $item['name'] ?>
                     </a>
                 <?php endforeach; ?>
             </div>
         </div>
 
+        <!-- PERBAIKAN: Menambahkan blok untuk menampilkan pesan error -->
         <?php if (session('success')): ?>
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <?= session('success') ?>
-        </div>
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <?= session('success') ?>
+            </div>
+        <?php elseif (session('error')): ?>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <?= session('error') ?>
+            </div>
         <?php endif; ?>
-        
+
+        <?php if (session('errors')): ?>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <p class="mb-0"><strong>Terdapat kesalahan validasi:</strong></p>
+                <ul>
+                    <?php foreach (session('errors') as $error): ?>
+                        <li><?= esc($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Daftar Satuan</h3>
@@ -53,22 +71,22 @@
                     </thead>
                     <tbody>
                         <?php foreach ($satuans as $satuan): ?>
-                        <tr>
-                            <td><?= esc($satuan['name']) ?></td>
-                            <td><?= esc($satuan['description']) ?></td>
-                            <td>
-                                <a href="<?= site_url('satuan/' . $satuan['id'] . '/edit') ?>" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="<?= site_url('satuan/' . $satuan['id']) ?>" method="post" class="d-inline">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus data ini?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td><?= esc($satuan['name']) ?></td>
+                                <td><?= esc($satuan['description']) ?></td>
+                                <td>
+                                    <a href="<?= site_url('satuan/' . $satuan['id'] . '/edit') ?>" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="<?= site_url('satuan/' . $satuan['id']) ?>" method="post" class="d-inline">
+                                        <?= csrf_field() ?>
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -109,8 +127,8 @@
 
 <?= $this->section('scripts') ?>
 <script>
-$(function () {
-    $('#dataTable').DataTable();
-});
+    $(function() {
+        $('#dataTable').DataTable();
+    });
 </script>
 <?= $this->endSection() ?>

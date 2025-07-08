@@ -19,8 +19,8 @@
         <div class="card">
             <div class="card-body">
                 <?php foreach ($classifications as $item): ?>
-                    <a href="<?= site_url($item['url']) ?>" 
-                       class="btn btn-app <?= $item['active'] ? 'bg-success' : 'bg-secondary' ?>">
+                    <a href="<?= site_url($item['url']) ?>"
+                        class="btn btn-app <?= $item['active'] ? 'bg-success' : 'bg-secondary' ?>">
                         <i class="<?= $item['icon'] ?>"></i> <?= $item['name'] ?>
                     </a>
                 <?php endforeach; ?>
@@ -28,12 +28,18 @@
         </div>
 
         <?php if (session('success')): ?>
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <?= session('success') ?>
-        </div>
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <?= session('success') ?>
+            </div>
         <?php endif; ?>
-        
+        <?php if (session('error')): ?>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <?= session('error') ?>
+            </div>
+        <?php endif; ?>
+
         <div class="card">
             <div class="card-header">
                 <!-- Judul tabel spesifik untuk Kategori -->
@@ -55,22 +61,22 @@
                     </thead>
                     <tbody>
                         <?php foreach ($categories as $category): ?>
-                        <tr>
-                            <td><?= esc($category['name']) ?></td>
-                            <td><?= esc($category['description']) ?></td>
-                            <td>
-                                <a href="<?= site_url('categories/' . $category['id'] . '/edit') ?>" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="<?= site_url('categories/' . $category['id']) ?>" method="post" class="d-inline">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus kategori ini?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td><?= esc($category['name']) ?></td>
+                                <td><?= esc($category['description']) ?></td>
+                                <td>
+                                    <a href="<?= site_url('categories/' . $category['id'] . '/edit') ?>" class="btn btn-sm btn-warning" onclick="return cekOtoritasKategori(event, '<?= $category['otoritas'] ?? '' ?>');">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="<?= site_url('categories/' . $category['id']) ?>" method="post" class="d-inline" onsubmit="return cekOtoritasKategori('<?= $category['otoritas'] ?? '' ?>');">
+                                        <?= csrf_field() ?>
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -111,8 +117,16 @@
 
 <?= $this->section('scripts') ?>
 <script>
-$(function () {
-    $('#categoriesTable').DataTable();
-});
+    function cekOtoritasKategori(event, otoritas) {
+        if (!otoritas) {
+            alert('Akses edit/delete kategori ini membutuhkan otoritas dari departemen yang berwenang. Silakan minta otoritas terlebih dahulu.');
+            if (event) event.preventDefault();
+            return false;
+        }
+        return true;
+    }
+    $(function() {
+        $('#categoriesTable').DataTable();
+    });
 </script>
 <?= $this->endSection() ?>

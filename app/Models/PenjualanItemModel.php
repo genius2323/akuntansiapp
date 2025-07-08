@@ -4,20 +4,29 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class SatuanModel extends Model
+class PenjualanItemModel extends Model
 {
-    protected $table            = 'satuan';
+    protected $table            = 'sales_items';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-
-    // Tambahkan otoritas agar bisa diupdate
-    protected $allowedFields    = ['name', 'description', 'otoritas', 'batas_tanggal_sistem', 'mode_batas_tanggal'];
-
+    protected $allowedFields    = [
+        'sales_id',
+        'product_id',
+        'product_code',
+        'product_name',
+        'qty',
+        'unit',
+        'price',
+        'discount',
+        'total',
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
-    protected $recoveredField = 'recovered_at';
 }

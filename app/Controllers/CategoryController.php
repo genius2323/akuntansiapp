@@ -1,4 +1,6 @@
-<?php namespace App\Controllers;
+<?php
+
+namespace App\Controllers;
 
 use App\Models\CategoryModel;
 
@@ -14,8 +16,8 @@ class CategoryController extends BaseController
     {
         // Data lengkap untuk tombol-tombol klasifikasi
         $classifications = [
-            ['name' => 'Satuan', 'url' => 'satuan', 'icon' => 'fas fa-ruler-combined', 'active' => false],
             ['name' => 'Kategori', 'url' => 'categories', 'icon' => 'fas fa-tags', 'active' => true],
+            ['name' => 'Satuan', 'url' => 'satuan', 'icon' => 'fas fa-ruler-combined', 'active' => false],
             ['name' => 'Jenis', 'url' => 'jenis', 'icon' => 'fas fa-boxes', 'active' => false],
             ['name' => 'Pelengkap', 'url' => 'pelengkap', 'icon' => 'fas fa-puzzle-piece', 'active' => false],
             ['name' => 'Gondola', 'url' => 'gondola', 'icon' => 'fas fa-store-alt', 'active' => false],
@@ -36,22 +38,41 @@ class CategoryController extends BaseController
         $data = [
             'title'           => 'Master Klasifikasi - Kategori',
             'classifications' => $classifications,
-            'categories'      => $this->getCategoryModel('default')->findAll()
+            'categories'      => $this->getCategoryModel('default')->select('id, name, description, otoritas')->findAll()
         ];
         return view('categories/index', $data);
     }
 
     public function edit($id)
     {
-        $data = [
-            'title'    => 'Edit Kategori',
-            'category' => $this->getCategoryModel('default')->find($id)
-        ];
-
-        if (empty($data['category'])) {
+        $category = $this->getCategoryModel('default')->find($id);
+        if (empty($category)) {
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Kategori tidak ditemukan.');
         }
-
+        // Cek otoritas
+        if ($category['otoritas'] !== 'T') {
+            return redirect()->to('/categories')->with('error', 'Akses edit kategori ini membutuhkan otoritas dari departemen yang berwenang.');
+        }
+        // Validasi batas tanggal
+        $mode = $category['mode_batas_tanggal'] ?? 'manual';
+        $batas = $category['batas_tanggal_sistem'] ?? null;
+        $today = date('Y-m-d');
+        if ($mode === 'automatic') {
+            $maxDate = date('Y-m-d', strtotime($today . ' -2 days'));
+            $created = isset($category['created_at']) ? substr($category['created_at'], 0, 10) : $today;
+            if ($created > $maxDate) {
+                return redirect()->to('/categories')->with('error', 'Edit hanya diizinkan untuk data H-2 atau lebih lama (mode automatic).');
+            }
+        } elseif ($mode === 'manual' && $batas) {
+            $created = isset($category['created_at']) ? substr($category['created_at'], 0, 10) : $today;
+            if ($created > $batas) {
+                return redirect()->to('/categories')->with('error', 'Edit hanya diizinkan sampai batas tanggal yang ditentukan.');
+            }
+        }
+        $data = [
+            'title'    => 'Edit Kategori',
+            'category' => $category
+        ];
         return view('categories/edit', $data);
     }
 
@@ -79,7 +100,7 @@ class CategoryController extends BaseController
             try {
                 $backupModel->insert($dataToSave);
             } catch (\Exception $e) {
-                $mainModel->delete($insertedID, true); 
+                $mainModel->delete($insertedID, true);
                 log_message('error', 'Backup database (category) failed: ' . $e->getMessage());
                 return redirect()->to('/categories')->with('error', 'Gagal menyimpan data backup. Data utama dibatalkan.');
             }
@@ -92,17 +113,45 @@ class CategoryController extends BaseController
 
     public function update($id)
     {
+        $category = $this->getCategoryModel('default')->find($id);
+        if (empty($category) || $category['otoritas'] !== 'T') {
+            return redirect()->to('/categories')->with('error', 'Akses update kategori ini membutuhkan otoritas dari departemen yang berwenang.');
+        }
+        // Validasi batas tanggal
+        $mode = $category['mode_batas_tanggal'] ?? 'manual';
+        $batas = $category['batas_tanggal_sistem'] ?? null;
+        $today = date('Y-m-d');
+        if ($mode === 'automatic') {
+            $maxDate = date('Y-m-d', strtotime($today . ' -2 days'));
+            $created = isset($category['created_at']) ? substr($category['created_at'], 0, 10) : $today;
+            if ($created > $maxDate) {
+                return redirect()->to('/categories')->with('error', 'Update hanya diizinkan untuk data H-2 atau lebih lama (mode automatic).');
+            }
+        } elseif ($mode === 'manual' && $batas) {
+            $created = isset($category['created_at']) ? substr($category['created_at'], 0, 10) : $today;
+            if ($created > $batas) {
+                return redirect()->to('/categories')->with('error', 'Update hanya diizinkan sampai batas tanggal yang ditentukan.');
+            }
+        }
         $dataToUpdate = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
         ];
 
+        // Update data
         $this->getCategoryModel('default')->update($id, $dataToUpdate);
-        
         try {
             $this->getCategoryModel('db1')->update($id, $dataToUpdate);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (category update) failed: ' . $e->getMessage());
+        }
+
+        // Kosongkan kolom otoritas setelah update
+        $this->getCategoryModel('default')->update($id, ['otoritas' => null]);
+        try {
+            $this->getCategoryModel('db1')->update($id, ['otoritas' => null]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (category otoritas clear) failed: ' . $e->getMessage());
         }
 
         return redirect()->to('/categories')->with('success', 'Kategori berhasil diperbarui.');
@@ -110,14 +159,41 @@ class CategoryController extends BaseController
 
     public function delete($id)
     {
+        $category = $this->getCategoryModel('default')->find($id);
+        if (empty($category) || $category['otoritas'] !== 'T') {
+            return redirect()->to('/categories')->with('error', 'Akses hapus kategori ini membutuhkan otoritas dari departemen yang berwenang.');
+        }
+        // Validasi batas tanggal
+        $mode = $category['mode_batas_tanggal'] ?? 'manual';
+        $batas = $category['batas_tanggal_sistem'] ?? null;
+        $today = date('Y-m-d');
+        if ($mode === 'automatic') {
+            $maxDate = date('Y-m-d', strtotime($today . ' -2 days'));
+            $created = isset($category['created_at']) ? substr($category['created_at'], 0, 10) : $today;
+            if ($created > $maxDate) {
+                return redirect()->to('/categories')->with('error', 'Hapus hanya diizinkan untuk data H-2 atau lebih lama (mode automatic).');
+            }
+        } elseif ($mode === 'manual' && $batas) {
+            $created = isset($category['created_at']) ? substr($category['created_at'], 0, 10) : $today;
+            if ($created > $batas) {
+                return redirect()->to('/categories')->with('error', 'Hapus hanya diizinkan sampai batas tanggal yang ditentukan.');
+            }
+        }
         $this->getCategoryModel('default')->delete($id);
-        
         try {
             $this->getCategoryModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (category delete) failed: ' . $e->getMessage());
         }
-        
+
+        // Kosongkan kolom otoritas setelah delete (jika soft delete, update data; jika hard delete, ini bisa di-skip)
+        $this->getCategoryModel('default')->update($id, ['otoritas' => null]);
+        try {
+            $this->getCategoryModel('db1')->update($id, ['otoritas' => null]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (category otoritas clear after delete) failed: ' . $e->getMessage());
+        }
+
         return redirect()->to('/categories')->with('success', 'Kategori berhasil dihapus dari kedua database.');
     }
 }

@@ -4,20 +4,18 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class SatuanModel extends Model
+class JenisModel extends Model
 {
-    protected $table            = 'satuan';
+    protected $table            = 'jenis';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
 
-    // Tambahkan otoritas agar bisa diupdate
     protected $allowedFields    = ['name', 'description', 'otoritas', 'batas_tanggal_sistem', 'mode_batas_tanggal'];
 
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
-    protected $recoveredField = 'recovered_at';
 }

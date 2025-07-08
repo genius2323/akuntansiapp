@@ -5,6 +5,10 @@ namespace Config;
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
 
+// Batas Tanggal Sistem (General)
+$routes->get('general/batasTanggalSistem', 'GeneralController::batasTanggalSistem');
+$routes->post('general/setBatasTanggalSistem', 'GeneralController::setBatasTanggalSistem');
+
 /*
  * --------------------------------------------------------------------
  * Router Setup
@@ -37,7 +41,7 @@ $routes->post('authenticate', 'AuthController::authenticate');
 $routes->get('logout', 'AuthController::logout');
 
 // Rute yang Dilindungi (Memerlukan Login)
-$routes->group('', ['filter' => 'auth'], function($routes) {
+$routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // Rute Dashboard Utama per Departemen
     $routes->get('pos', 'PosController::index', ['filter' => 'department:1']);
@@ -45,8 +49,8 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('general', 'GeneralController::index', ['filter' => 'department:3']);
 
     // Rute untuk Departemen General (ID: 3)
-    $routes->group('', ['filter' => 'department:3'], function($routes) {
-        
+    $routes->group('', ['filter' => 'department:3'], function ($routes) {
+
         // Manajemen User
         $routes->get('users', 'UserController::index');
         $routes->post('users/create', 'UserController::store');
@@ -56,6 +60,13 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
         $routes->get('users/trash', 'UserController::trash');
         $routes->post('users/restore/(:num)', 'UserController::restore/$1');
         $routes->post('users/force-delete/(:num)', 'UserController::forceDelete/$1');
+
+
+        // Menu Otoritas Kategori & Satuan
+        $routes->get('general/otoritasKategori', 'GeneralController::otoritasKategori');
+        $routes->post('general/setOtoritasKategori', 'GeneralController::setOtoritasKategori');
+        $routes->get('general/otoritasSatuan', 'GeneralController::otoritasSatuan');
+        $routes->post('general/setOtoritasSatuan', 'GeneralController::setOtoritasSatuan');
 
         // Master Kategori
         $routes->get('categories', 'CategoryController::index');
@@ -71,6 +82,14 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
         $routes->put('satuan/(:num)', 'SatuanController::update/$1');
         $routes->delete('satuan/(:num)', 'SatuanController::delete/$1');
 
+
+        // Master Jenis
+        $routes->get('jenis', 'JenisController::index');
+        $routes->post('jenis/create', 'JenisController::create');
+        $routes->get('jenis/(:num)/edit', 'JenisController::edit/$1');
+        $routes->put('jenis/(:num)', 'JenisController::update/$1');
+        $routes->delete('jenis/(:num)', 'JenisController::delete/$1');
+
         // Master Produk
         $routes->get('products', 'ProductController::index');
         $routes->post('products/create', 'ProductController::create');
@@ -82,7 +101,6 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
         $routes->get('penjualan', 'PenjualanController::index');
         $routes->post('penjualan/store', 'PenjualanController::store');
     });
-
 });
 
 
