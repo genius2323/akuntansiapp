@@ -1,16 +1,10 @@
-<?php
-// View: app/Views/jenis/index.php
-?>
 <?= $this->extend('layouts/adminlte') ?>
-
 <?= $this->section('content') ?>
 <div class="content-header">
     <?= $this->include('partials/_klasifikasi_menu') ?>
 </div>
-
 <section class="content">
     <div class="container-fluid">
-
         <!-- TOMBOL KLASIFIKASI DITAMBAHKAN DI SINI -->
 
         <?php if (session('success')): ?>
@@ -27,27 +21,27 @@
         <?php endif; ?>
         <div class="card">
             <div class="card-body">
-                <a href="<?= site_url('jenis/create') ?>" class="btn btn-primary mb-3">Tambah Jenis</a>
+                <a href="<?= site_url('merk/create') ?>" class="btn btn-primary mb-3">Tambah Merk</a>
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nama Jenis</th>
+                            <th>Nama Merk</th>
                             <th>Deskripsi</th>
                             <th>Otoritas</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($jenis as $row): ?>
+                        <?php foreach ($merks as $row): ?>
                             <tr>
                                 <td><?= $row['id'] ?></td>
                                 <td><?= esc($row['name']) ?></td>
                                 <td><?= esc($row['description']) ?></td>
                                 <td><?= $row['otoritas'] === 'T' ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-secondary">Nonaktif</span>' ?></td>
                                 <td>
-                                    <a href="<?= site_url('jenis/' . $row['id'] . '/edit') ?>" class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="<?= site_url('jenis/' . $row['id']) ?>" method="post" style="display:inline-block;">
+                                    <a href="<?= site_url('merk/' . $row['id'] . '/edit') ?>" class="btn btn-sm btn-warning">Edit</a>
+                                    <form action="<?= site_url('merk/' . $row['id']) ?>" method="post" style="display:inline-block;">
                                         <input type="hidden" name="_method" value="DELETE">
                                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus data ini?')">Hapus</button>
                                     </form>

@@ -16,10 +16,13 @@
                     <input type="hidden" name="_method" value="PUT">
                     
                     <div class="form-group">
+                        <label>Kode Kategori</label>
+                        <input type="text" name="kode_cat" class="form-control" maxlength="4" pattern="[A-Za-z0-9]+" value="<?= esc($category['kode_cat'] ?? '') ?>" required>
+                    </div>
+                    <div class="form-group">
                         <label>Nama Kategori</label>
                         <input type="text" name="name" class="form-control" value="<?= esc($category['name']) ?>" required>
                     </div>
-                    
                     <div class="form-group">
                         <label>Deskripsi</label>
                         <textarea name="description" class="form-control" rows="3"><?= esc($category['description']) ?></textarea>

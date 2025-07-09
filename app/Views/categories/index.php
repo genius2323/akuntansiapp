@@ -2,30 +2,14 @@
 
 <?= $this->section('content') ?>
 <div class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <!-- Judul utama diubah menjadi lebih umum -->
-                <h1 class="m-0">Master Klasifikasi</h1>
-            </div>
-        </div>
-    </div>
+    <?= $this->include('partials/_klasifikasi_menu') ?>
 </div>
 
 <section class="content">
     <div class="container-fluid">
 
         <!-- TOMBOL KLASIFIKASI DITAMBAHKAN DI SINI -->
-        <div class="card">
-            <div class="card-body">
-                <?php foreach ($classifications as $item): ?>
-                    <a href="<?= site_url($item['url']) ?>"
-                        class="btn btn-app <?= $item['active'] ? 'bg-success' : 'bg-secondary' ?>">
-                        <i class="<?= $item['icon'] ?>"></i> <?= $item['name'] ?>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        </div>
+
 
         <?php if (session('success')): ?>
             <div class="alert alert-success alert-dismissible">
@@ -54,6 +38,8 @@
                 <table id="categoriesTable" class="table table-bordered table-striped">
                     <thead>
                         <tr>
+                            <th>ID</th>
+                            <th>Kode Kategori</th>
                             <th>Nama Kategori</th>
                             <th>Deskripsi</th>
                             <th width="15%">Aksi</th>
@@ -62,6 +48,8 @@
                     <tbody>
                         <?php foreach ($categories as $category): ?>
                             <tr>
+                                <td><?= $category['id'] ?></td>
+                                <td><?= esc($category['kode_cat'] ?? '') ?></td>
                                 <td><?= esc($category['name']) ?></td>
                                 <td><?= esc($category['description']) ?></td>
                                 <td>
@@ -95,6 +83,10 @@
                     <h5 class="modal-title">Tambah Kategori Baru</h5>
                 </div>
                 <div class="modal-body">
+                    <div class="form-group">
+                        <label>Kode Kategori</label>
+                        <input type="text" name="kode_cat" class="form-control" maxlength="4" pattern="[A-Za-z0-9]+" required>
+                    </div>
                     <div class="form-group">
                         <label>Nama Kategori</label>
                         <input type="text" name="name" class="form-control" required>

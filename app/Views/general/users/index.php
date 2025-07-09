@@ -51,14 +51,19 @@
                             <td><?= esc($user['alamat']) ?></td>
                             <td>
                                 <!-- Tombol Edit -->
-                                <a href="<?= base_url("users/edit/$user[id]") ?>" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                
+                                <?php if (($user['otoritas'] ?? null) === 'T'): ?>
+                                    <a href="<?= base_url("users/edit/$user[id]") ?>" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                <?php else: ?>
+                                    <button class="btn btn-sm btn-warning" disabled title="Belum diotorisasi">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                <?php endif; ?>
                                 <!-- Tombol Soft Delete -->
                                 <form action="<?= base_url("users/delete/$user[id]") ?>" method="post" class="d-inline">
                                     <?= csrf_field() ?>
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Arsipkan user ini?')">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Arsipkan user ini?')" <?= (($user['otoritas'] ?? null) !== 'T') ? 'disabled title="Belum diotorisasi"' : '' ?>>
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>

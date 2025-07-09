@@ -2,29 +2,14 @@
 
 <?= $this->section('content') ?>
 <div class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0">Master Klasifikasi</h1>
-            </div>
-        </div>
-    </div>
+    <?= $this->include('partials/_klasifikasi_menu') ?>
 </div>
 
 <section class="content">
     <div class="container-fluid">
 
         <!-- Tombol Klasifikasi -->
-        <div class="card">
-            <div class="card-body">
-                <?php foreach ($classifications as $item): ?>
-                    <a href="<?= site_url($item['url']) ?>"
-                        class="btn btn-app <?= $item['active'] ? 'bg-success' : 'bg-secondary' ?>">
-                        <i class="<?= $item['icon'] ?>"></i> <?= $item['name'] ?>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        </div>
+
 
         <!-- PERBAIKAN: Menambahkan blok untuk menampilkan pesan error -->
         <?php if (session('success')): ?>
@@ -64,6 +49,7 @@
                 <table id="dataTable" class="table table-bordered table-striped">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Nama Satuan</th>
                             <th>Deskripsi</th>
                             <th width="15%">Aksi</th>
@@ -72,6 +58,7 @@
                     <tbody>
                         <?php foreach ($satuans as $satuan): ?>
                             <tr>
+                                <td><?= $satuan['id'] ?></td>
                                 <td><?= esc($satuan['name']) ?></td>
                                 <td><?= esc($satuan['description']) ?></td>
                                 <td>

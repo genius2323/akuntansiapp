@@ -1,9 +1,35 @@
 <?php
-
 namespace Config;
-
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
+
+// Master Model
+$routes->get('model', 'ModelController::index');
+$routes->post('model/create', 'ModelController::create');
+$routes->get('model/(:num)/edit', 'ModelController::edit/$1');
+$routes->put('model/(:num)', 'ModelController::update/$1');
+$routes->delete('model/(:num)', 'ModelController::delete/$1');
+
+// Master Fiting
+$routes->get('fiting', 'FitingController::index');
+$routes->post('fiting/create', 'FitingController::create');
+$routes->get('fiting/(:num)/edit', 'FitingController::edit/$1');
+$routes->put('fiting/(:num)', 'FitingController::update/$1');
+$routes->delete('fiting/(:num)', 'FitingController::delete/$1');
+
+// Master Daya
+$routes->get('daya', 'DayaController::index');
+$routes->post('daya/create', 'DayaController::create');
+$routes->get('daya/(:num)/edit', 'DayaController::edit/$1');
+$routes->put('daya/(:num)', 'DayaController::update/$1');
+$routes->delete('daya/(:num)', 'DayaController::delete/$1');
+
+// Master Jumlah Mata
+$routes->get('jumlah-mata', 'JumlahMataController::index');
+$routes->post('jumlah-mata/create', 'JumlahMataController::create');
+$routes->get('jumlah-mata/(:num)/edit', 'JumlahMataController::edit/$1');
+$routes->put('jumlah-mata/(:num)', 'JumlahMataController::update/$1');
+$routes->delete('jumlah-mata/(:num)', 'JumlahMataController::delete/$1');
 
 // Batas Tanggal Sistem (General)
 $routes->get('general/batasTanggalSistem', 'GeneralController::batasTanggalSistem');
@@ -70,6 +96,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         // Otoritas Produk
         $routes->get('general/otoritasProduk', 'GeneralController::otoritasProduk');
         $routes->post('general/setOtoritasProduk', 'GeneralController::setOtoritasProduk');
+        // Otoritas User
+        $routes->get('general/otoritasUser', 'GeneralOtoritasUserController::otoritasUser');
+        $routes->post('general/setOtoritasUser', 'GeneralOtoritasUserController::setOtoritasUser');
 
         // Master Kategori
         $routes->get('categories', 'CategoryController::index');
@@ -92,6 +121,76 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('jenis/(:num)/edit', 'JenisController::edit/$1');
         $routes->put('jenis/(:num)', 'JenisController::update/$1');
         $routes->delete('jenis/(:num)', 'JenisController::delete/$1');
+
+        // Master Pelengkap
+        $routes->get('pelengkap', 'PelengkapController::index');
+        $routes->post('pelengkap/create', 'PelengkapController::create');
+        $routes->get('pelengkap/(:num)/edit', 'PelengkapController::edit/$1');
+        $routes->put('pelengkap/(:num)', 'PelengkapController::update/$1');
+        $routes->delete('pelengkap/(:num)', 'PelengkapController::delete/$1');
+
+        // Master Gondola
+        $routes->get('gondola', 'GondolaController::index');
+        $routes->post('gondola/create', 'GondolaController::create');
+        $routes->get('gondola/(:num)/edit', 'GondolaController::edit/$1');
+        $routes->put('gondola/(:num)', 'GondolaController::update/$1');
+        $routes->delete('gondola/(:num)', 'GondolaController::delete/$1');
+
+        // Master Merk
+        $routes->get('merk', 'MerkController::index');
+        $routes->post('merk/create', 'MerkController::create');
+        $routes->get('merk/(:num)/edit', 'MerkController::edit/$1');
+        $routes->put('merk/(:num)', 'MerkController::update/$1');
+        $routes->delete('merk/(:num)', 'MerkController::delete/$1');
+
+        // Master Warna Sinar
+        $routes->get('warnasinar', 'WarnaSinarController::index');
+        $routes->post('warnasinar/create', 'WarnaSinarController::create');
+        $routes->get('warnasinar/(:num)/edit', 'WarnaSinarController::edit/$1');
+        $routes->put('warnasinar/(:num)', 'WarnaSinarController::update/$1');
+        $routes->delete('warnasinar/(:num)', 'WarnaSinarController::delete/$1');
+
+        // Master Ukuran Barang
+        $routes->get('ukuranbarang', 'UkuranBarangController::index');
+        $routes->post('ukuranbarang/create', 'UkuranBarangController::create');
+        $routes->get('ukuranbarang/(:num)/edit', 'UkuranBarangController::edit/$1');
+        $routes->put('ukuranbarang/(:num)', 'UkuranBarangController::update/$1');
+        $routes->delete('ukuranbarang/(:num)', 'UkuranBarangController::delete/$1');
+
+        // Master Voltase
+        $routes->get('voltase', 'VoltaseController::index');
+        $routes->post('voltase/create', 'VoltaseController::create');
+        $routes->get('voltase/(:num)/edit', 'VoltaseController::edit/$1');
+        $routes->put('voltase/(:num)', 'VoltaseController::update/$1');
+        $routes->delete('voltase/(:num)', 'VoltaseController::delete/$1');
+
+        // Master Dimensi
+        $routes->get('dimensi', 'DimensiController::index');
+        $routes->post('dimensi/create', 'DimensiController::create');
+        $routes->get('dimensi/(:num)/edit', 'DimensiController::edit/$1');
+        $routes->put('dimensi/(:num)', 'DimensiController::update/$1');
+        $routes->delete('dimensi/(:num)', 'DimensiController::delete/$1');
+
+        // Master Warna Body
+        $routes->get('warnabody', 'WarnaBodyController::index');
+        $routes->post('warnabody/create', 'WarnaBodyController::create');
+        $routes->get('warnabody/(:num)/edit', 'WarnaBodyController::edit/$1');
+        $routes->put('warnabody/(:num)', 'WarnaBodyController::update/$1');
+        $routes->delete('warnabody/(:num)', 'WarnaBodyController::delete/$1');
+
+        // Master Warna Bibir
+        $routes->get('warnabibir', 'WarnaBibirController::index');
+        $routes->post('warnabibir/create', 'WarnaBibirController::create');
+        $routes->get('warnabibir/(:num)/edit', 'WarnaBibirController::edit/$1');
+        $routes->put('warnabibir/(:num)', 'WarnaBibirController::update/$1');
+        $routes->delete('warnabibir/(:num)', 'WarnaBibirController::delete/$1');
+
+        // Master Kaki
+        $routes->get('kaki', 'KakiController::index');
+        $routes->post('kaki/create', 'KakiController::create');
+        $routes->get('kaki/(:num)/edit', 'KakiController::edit/$1');
+        $routes->put('kaki/(:num)', 'KakiController::update/$1');
+        $routes->delete('kaki/(:num)', 'KakiController::delete/$1');
 
         // Master Produk
         $routes->get('products', 'ProductController::index');

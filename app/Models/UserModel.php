@@ -16,7 +16,8 @@ class UserModel extends Model
         'created_at',
         'updated_at',
         'deleted_at',
-        'recovered_at'
+        'recovered_at',
+        'otoritas'
     ];
 
     protected $useTimestamps = true;
@@ -27,7 +28,7 @@ class UserModel extends Model
     protected $recoveredField = 'recovered_at';
 
     protected $validationRules = [
-        'username' => 'required|min_length[3]|is_unique[users.username,id,{id}]',
+        'username' => 'required|min_length[3]',
         'password' => 'required|min_length[8]',
         'department_id' => 'required|numeric',
         'noktp' => 'permit_empty|numeric|min_length[16]|max_length[16]'

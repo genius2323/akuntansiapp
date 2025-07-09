@@ -38,7 +38,7 @@ class CategoryController extends BaseController
         $data = [
             'title'           => 'Master Klasifikasi - Kategori',
             'classifications' => $classifications,
-            'categories'      => $this->getCategoryModel('default')->select('id, name, description, otoritas')->findAll()
+            'categories'      => $this->getCategoryModel('default')->select('id, kode_cat, name, description, otoritas')->findAll()
         ];
         return view('categories/index', $data);
     }
@@ -78,7 +78,9 @@ class CategoryController extends BaseController
 
     public function create()
     {
+
         $rules = [
+            'kode_cat' => 'required|alpha_numeric|max_length[4]|is_unique[categories.kode_cat]',
             'name' => 'required|min_length[3]|is_unique[categories.name]'
         ];
 
@@ -87,6 +89,7 @@ class CategoryController extends BaseController
         }
 
         $dataToSave = [
+            'kode_cat'    => $this->request->getPost('kode_cat'),
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
         ];
@@ -133,10 +136,20 @@ class CategoryController extends BaseController
                 return redirect()->to('/categories')->with('error', 'Update hanya diizinkan sampai batas tanggal yang ditentukan.');
             }
         }
+
+        $rules = [
+            'kode_cat' => 'required|alpha_numeric|max_length[4]|is_unique[categories.kode_cat,id,{id}]',
+            'name' => 'required|min_length[3]|is_unique[categories.name,id,{id}]'
+        ];
         $dataToUpdate = [
+            'kode_cat'    => $this->request->getPost('kode_cat'),
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
         ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->to('/categories/' . $id . '/edit')->withInput()->with('errors', $this->validator->getErrors());
+        }
 
         // Update data
         $this->getCategoryModel('default')->update($id, $dataToUpdate);

@@ -1,19 +1,14 @@
 <?php
-
 namespace App\Models;
-
 use CodeIgniter\Model;
-
-class CategoryModel extends Model
+class WarnaSinarModel extends Model
 {
-    protected $table            = 'categories';
+    protected $table            = 'warna_sinar';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-
-    protected $allowedFields    = ['kode_cat', 'name', 'description', 'otoritas', 'batas_tanggal_sistem', 'mode_batas_tanggal'];
-
+    protected $allowedFields    = ['name', 'description', 'otoritas', 'batas_tanggal_sistem', 'mode_batas_tanggal'];
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
