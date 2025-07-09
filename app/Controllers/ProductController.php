@@ -2,6 +2,8 @@
 
 use App\Models\ProductModel;
 use App\Models\CategoryModel;
+use App\Models\SatuanModel;
+use App\Models\JenisModel;
 
 class ProductController extends BaseController
 {
@@ -23,11 +25,15 @@ class ProductController extends BaseController
     {
         $productModel = $this->getModel('ProductModel', 'default');
         $categoryModel = $this->getModel('CategoryModel', 'default');
+        $satuanModel = $this->getModel('SatuanModel', 'default');
+        $jenisModel = $this->getModel('JenisModel', 'default');
         
         $data = [
             'title'      => 'Master Produk',
             'products'   => $productModel->getProductsWithCategory(),
-            'categories' => $categoryModel->findAll()
+            'categories' => $categoryModel->findAll(),
+            'satuans'    => $satuanModel->findAll(),
+            'jenis'      => $jenisModel->findAll(),
         ];
         return view('products/index', $data);
     }
@@ -76,16 +82,26 @@ class ProductController extends BaseController
     {
         $productModel = $this->getModel('ProductModel', 'default');
         $categoryModel = $this->getModel('CategoryModel', 'default');
+        $satuanModel = $this->getModel('SatuanModel', 'default');
+        $jenisModel = $this->getModel('JenisModel', 'default');
+
+        $product = $productModel->find($id);
+        if (empty($product)) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Produk tidak ditemukan.');
+        }
+
+        // Validasi otoritas: hanya bisa edit jika otoritas produk = 'T'
+        if (($product['otoritas'] ?? 'F') !== 'T') {
+            return redirect()->to('/products')->with('error', 'Edit produk hanya diizinkan jika sudah diotorisasi oleh Departemen General. Silakan minta otorisasi ke Departemen General.');
+        }
 
         $data = [
             'title'      => 'Edit Produk',
-            'product'    => $productModel->find($id),
-            'categories' => $categoryModel->findAll()
+            'product'    => $product,
+            'categories' => $categoryModel->findAll(),
+            'satuans'    => $satuanModel->findAll(),
+            'jenis'      => $jenisModel->findAll(),
         ];
-
-        if (empty($data['product'])) {
-            throw new \CodeIgniter\Exceptions\PageNotFoundException('Produk tidak ditemukan.');
-        }
 
         return view('products/edit', $data);
     }
@@ -103,15 +119,27 @@ class ProductController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
+        $product = $this->getModel('ProductModel', 'default')->find($id);
+        if (!$product) {
+            return redirect()->to('/products')->with('error', 'Produk tidak ditemukan.');
+        }
+
+        // Validasi otoritas produk
+        if (($product['otoritas'] ?? 'F') !== 'T') {
+            return redirect()->to('/products')->with('error', 'Edit produk hanya diizinkan jika sudah diotorisasi oleh Departemen General. Silakan minta otorisasi ke Departemen General.');
+        }
+
         $dataToUpdate = [
             'name'        => $this->request->getPost('name'),
             'category_id' => $this->request->getPost('category_id'),
+            'satuan_id'   => $this->request->getPost('satuan_id'),
+            'jenis_id'    => $this->request->getPost('jenis_id'),
             'price'       => $this->request->getPost('price'),
             'stock'       => $this->request->getPost('stock'),
+            'otoritas'    => null // reset otoritas setelah edit
         ];
 
         $this->getModel('ProductModel', 'default')->update($id, $dataToUpdate);
-
         try {
             $this->getModel('ProductModel', 'db1')->update($id, $dataToUpdate);
         } catch (\Exception $e) {
@@ -123,14 +151,23 @@ class ProductController extends BaseController
 
     public function delete($id)
     {
+        $product = $this->getModel('ProductModel', 'default')->find($id);
+        if (!$product) {
+            return redirect()->to('/products')->with('error', 'Produk tidak ditemukan.');
+        }
+        // Validasi otoritas produk
+        if (($product['otoritas'] ?? 'F') !== 'T') {
+            return redirect()->to('/products')->with('error', 'Hapus produk hanya diizinkan jika sudah diotorisasi oleh Departemen General. Silakan minta otorisasi ke Departemen General.');
+        }
+        $dataToUpdate = ['otoritas' => null]; // reset otoritas setelah hapus
+        $this->getModel('ProductModel', 'default')->update($id, $dataToUpdate);
         $this->getModel('ProductModel', 'default')->delete($id);
-        
         try {
+            $this->getModel('ProductModel', 'db1')->update($id, $dataToUpdate);
             $this->getModel('ProductModel', 'db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (product delete) failed: ' . $e->getMessage());
         }
-        
         return redirect()->to('/products')->with('success', 'Produk berhasil dihapus.');
     }
 }

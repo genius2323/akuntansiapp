@@ -20,6 +20,13 @@
         </div>
         <?php endif; ?>
         
+        <?php if (session('error')): ?>
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <?= session('error') ?>
+        </div>
+        <?php endif; ?>
+        
         <div class="card">
             <div class="card-header">
                 <button class="btn btn-primary" data-toggle="modal" data-target="#addProductModal">
@@ -96,6 +103,24 @@
                     <div class="form-group">
                         <label>Stok</label>
                         <input type="number" name="stock" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Satuan</label>
+                        <select name="satuan_id" class="form-control">
+                            <option value="">-- Pilih Satuan --</option>
+                            <?php foreach ($satuans as $satuan): ?>
+                            <option value="<?= $satuan['id'] ?>"><?= esc($satuan['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis</label>
+                        <select name="jenis_id" class="form-control">
+                            <option value="">-- Pilih Jenis --</option>
+                            <?php foreach ($jenis as $j): ?>
+                            <option value="<?= $j['id'] ?>"><?= esc($j['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">

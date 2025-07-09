@@ -1,6 +1,5 @@
 <?php
-// View: app/Views/general/otoritas_satuan.php
-// Menu Otoritas Satuan
+// View: app/Views/general/otoritas_produk.php
 ?>
 
 <?= $this->extend('layouts/adminlte') ?>
@@ -8,9 +7,7 @@
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
-            <div class="col-sm-6">
-                <!-- Heading dipindah ke bawah -->
-            </div>
+            <div class="col-sm-6"></div>
         </div>
     </div>
 </div>
@@ -22,13 +19,19 @@
                 <?= session('success') ?>
             </div>
         <?php endif; ?>
+        <?php if (session('error')): ?>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <?= session('error') ?>
+            </div>
+        <?php endif; ?>
         <div class="card">
             <div class="card-body">
                 <h3 class="mb-3">Otoritas</h3>
                 <?php
                 $uri = service('request')->getUri();
                 $segments = $uri->getSegments();
-                $current = isset($segments[1]) ? $segments[1] : 'kategori';
+                $current = isset($segments[2]) ? $segments[2] : 'produk';
                 $otoritasMenus = [
                     ['name' => 'Kategori', 'slug' => 'kategori', 'icon' => 'fas fa-tags', 'url' => site_url('general/otoritasKategori')],
                     ['name' => 'Satuan', 'slug' => 'satuan', 'icon' => 'fas fa-ruler-combined', 'url' => site_url('general/otoritasSatuan')],
@@ -47,7 +50,7 @@
                     ['name' => 'Fiting', 'slug' => 'fiting', 'icon' => 'fas fa-plug', 'url' => site_url('general/otoritasFiting')],
                     ['name' => 'Daya', 'slug' => 'daya', 'icon' => 'fas fa-power-off', 'url' => site_url('general/otoritasDaya')],
                     ['name' => 'Jumlah Mata', 'slug' => 'jumlah-mata', 'icon' => 'fas fa-eye', 'url' => site_url('general/otoritasJumlahMata')],
-                    ['name' => 'Produk', 'slug' => 'produk', 'icon' => 'fas fa-box', 'url' => site_url('general/otoritasProduk')],
+                    ['name' => 'Produk', 'slug' => 'produk', 'icon' => 'fas fa-box', 'url' => site_url('general/otoritasProduk')],                  
                 ];
                 ?>
                 <?php foreach ($otoritasMenus as $item): ?>
@@ -59,14 +62,14 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <h4 class="mb-3">Otoritas Satuan</h4>
-                <form method="post" action="<?= site_url('general/setOtoritasSatuan') ?>">
+                <h4 class="mb-3">Otoritas Produk</h4>
+                <form method="post" action="<?= site_url('general/setOtoritasProduk') ?>">
                     <div class="form-group">
-                        <label for="satuan">Pilih Satuan:</label>
-                        <select name="satuan_id" id="satuan_id" class="form-control select2" required>
-                            <option value="">-- Cari & Pilih Satuan --</option>
-                            <?php foreach ($satuans as $sat): ?>
-                                <option value="<?= $sat['id'] ?>"><?= esc($sat['name']) ?></option>
+                        <label for="produk_id">Pilih Produk:</label>
+                        <select name="produk_id" id="produk_id" class="form-control select2" required>
+                            <option value="">-- Cari & Pilih Produk --</option>
+                            <?php foreach ($products as $prod): ?>
+                                <option value="<?= $prod['id'] ?>"><?= esc($prod['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -87,8 +90,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('#satuan_id').select2({
-            placeholder: '-- Cari & Pilih Satuan --',
+        $('#produk_id').select2({
+            placeholder: '-- Cari & Pilih Produk --',
             width: 'resolve',
             allowClear: true
         });

@@ -53,8 +53,6 @@ class GeneralController extends BaseController
         return redirect()->to('/general/batasTanggalSistem')->with('success', 'Batas tanggal sistem berhasil disimpan!');
     }
 
-    // ...existing code...
-    // (hapus baris use dan class di tengah file, karena sudah ada di atas)
     public function index()
     {
         $data = [
@@ -107,8 +105,9 @@ class GeneralController extends BaseController
     public function otoritasKategori()
     {
         $categoryModel = new CategoryModel();
+        // Ambil semua kolom yang dibutuhkan agar status otoritas dan deskripsi tampil dan update
         $data = [
-            'categories' => $categoryModel->select('id, name')->findAll(),
+            'categories' => $categoryModel->select('id, name, description, otoritas')->findAll(),
         ];
         return view('general/otoritas', $data);
     }
@@ -178,5 +177,30 @@ class GeneralController extends BaseController
         } else {
             return redirect()->to('/general/otoritasJenis')->with('success', 'Otoritas jenis dinonaktifkan & batas tanggal disimpan di kedua database.');
         }
+    }
+
+    // Menu Otoritas Produk
+    public function otoritasProduk()
+    {
+        $productModel = new \App\Models\ProductModel();
+        $data = [
+            'products' => $productModel->where('deleted_at', null)->findAll()
+        ];
+        return view('general/otoritas_produk', $data);
+    }
+
+    // Proses set otoritas produk
+    public function setOtoritasProduk()
+    {
+        $produkId = $this->request->getPost('produk_id');
+        $otoritas = $this->request->getPost('otoritas') === 'T' ? 'T' : null;
+        $mainModel = new \App\Models\ProductModel(\Config\Database::connect('default'));
+        $backupModel = new \App\Models\ProductModel(\Config\Database::connect('db1'));
+        if ($produkId) {
+            $mainModel->update($produkId, ['otoritas' => $otoritas]);
+            $backupModel->update($produkId, ['otoritas' => $otoritas]);
+            return redirect()->to('/general/otoritasProduk')->with('success', 'Otoritas produk berhasil diubah.');
+        }
+        return redirect()->to('/general/otoritasProduk')->with('error', 'Produk tidak ditemukan.');
     }
 }

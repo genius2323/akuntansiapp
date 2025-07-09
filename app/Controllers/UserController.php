@@ -129,8 +129,13 @@ class UserController extends BaseController
         if (!is_numeric($id)) {
             return redirect()->to('/users')->with('error', 'ID tidak valid');
         }
-
-        $this->userModel->delete($id); //
+        $user = $this->userModel->find($id);
+        if (!$user || !isset($user['otoritas']) || $user['otoritas'] !== 'T') {
+            return redirect()->to('/users')->with('error', 'Akses hapus user ini membutuhkan otorisasi.');
+        }
+        $this->userModel->delete($id);
+        // Reset otoritas setelah hapus (soft delete)
+        $this->userModel->update($id, ['otoritas' => null]);
         return redirect()->to('/users')->with('success', 'User berhasil diarsipkan');
     }
 
@@ -163,7 +168,10 @@ class UserController extends BaseController
         if (!is_numeric($id)) {
             return redirect()->to('/users/trash')->with('error', 'ID tidak valid');
         }
-
+        $user = $this->userModel->onlyDeleted()->find($id);
+        if (!$user || !isset($user['otoritas']) || $user['otoritas'] !== 'T') {
+            return redirect()->to('/users/trash')->with('error', 'Akses hapus permanen user ini membutuhkan otorisasi.');
+        }
         $this->userModel->delete($id, true); // Hard delete
         return redirect()->to('/users/trash')->with('success', 'User berhasil dihapus permanen');
     }

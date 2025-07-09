@@ -69,6 +69,7 @@
                     ['name' => 'Fiting', 'slug' => 'fiting', 'icon' => 'fas fa-plug', 'url' => site_url('general/otoritasFiting')],
                     ['name' => 'Daya', 'slug' => 'daya', 'icon' => 'fas fa-power-off', 'url' => site_url('general/otoritasDaya')],
                     ['name' => 'Jumlah Mata', 'slug' => 'jumlah-mata', 'icon' => 'fas fa-eye', 'url' => site_url('general/otoritasJumlahMata')],
+                    ['name' => 'Produk', 'slug' => 'produk', 'icon' => 'fas fa-box', 'url' => site_url('general/otoritasProduk')],
                 ];
                 ?>
                 <?php foreach ($otoritasMenus as $item): ?>
@@ -81,33 +82,49 @@
         <div class="card">
             <div class="card-body">
                 <h4 class="mb-3">Otoritas Kategori</h4>
-                <form method="post" action="<?= site_url('general/setOtoritasKategori') ?>">
-                    <div class="form-group">
-                        <label for="kategori">Pilih Kategori:</label>
-                        <select name="kategori_id" id="kategori_id" class="form-control select2" required>
-                            <option value="">-- Cari & Pilih Kategori --</option>
-                            <?php foreach ($categories as $cat): ?>
-                                <option value="<?= $cat['id'] ?>"><?= esc($cat['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="batas_tanggal_sistem">Batas Tanggal Sistem:</label>
-                        <input type="date" class="form-control" id="batas_tanggal_sistem" name="batas_tanggal_sistem" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="mode_batas_tanggal">Mode Batas Tanggal:</label>
-                        <select class="form-control" id="mode_batas_tanggal" name="mode_batas_tanggal" required>
-                            <option value="manual">Manual</option>
-                            <option value="automatic">Automatic (H-2)</option>
-                        </select>
-                    </div>
-                    <div class="form-group form-check">
-                        <input type="checkbox" class="form-check-input" id="otoritas" name="otoritas" value="T">
-                        <label class="form-check-label" for="otoritas">Izinkan Edit/Hapus (Otoritas Aktif)</label>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Set Otoritas</button>
-                </form>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Kategori</th>
+                                <th>Deskripsi</th>
+                                <th>Status Otorisasi</th>
+                                <th>Aksi Otorisasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($categories)): ?>
+                                <?php foreach ($categories as $i => $cat): ?>
+                                    <tr>
+                                        <td><?= $i + 1 ?></td>
+                                        <td><?= esc($cat['name']) ?></td>
+                                        <td><?= esc(isset($cat['description']) ? $cat['description'] : '-') ?></td>
+                                        <td>
+                                            <?php if (($cat['otoritas'] ?? null) === 'T'): ?>
+                                                <span class="badge badge-success">Sudah Diotorisasi</span>
+                                            <?php else: ?>
+                                                <span class="badge badge-secondary">Belum</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <form method="post" action="<?= site_url('general/setOtoritasKategori') ?>" style="display:inline;">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="kategori_id" value="<?= $cat['id'] ?>">
+                                                <input type="hidden" name="otoritas" value="T">
+                                                <button type="submit" class="btn btn-sm btn-warning" <?= (isset($cat['otoritas']) && $cat['otoritas'] === 'T') ? 'disabled' : '' ?>>
+                                                    Otorisasi
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr><td colspan="5" class="text-center">Belum ada data kategori</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

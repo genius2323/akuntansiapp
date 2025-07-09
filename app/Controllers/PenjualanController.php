@@ -264,4 +264,18 @@ class PenjualanController extends BaseController
         $itemModelBackup->where('sales_id', $id)->delete();
         return redirect()->to('/penjualan')->with('success', 'Transaksi berhasil dihapus!');
     }
+
+    /**
+     * Dashboard penjualan: tombol input & tabel data
+     */
+    public function dashboard()
+    {
+        $mainModel = $this->getPenjualanModel('default');
+        $penjualans = $mainModel->where('deleted_at', null)->orderBy('tanggal_nota', 'desc')->findAll();
+        $data = [
+            'page_heading' => 'Dashboard Penjualan',
+            'penjualans' => $penjualans
+        ];
+        return view('dashboard_view', $data);
+    }
 }

@@ -67,6 +67,9 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->post('general/setOtoritasKategori', 'GeneralController::setOtoritasKategori');
         $routes->get('general/otoritasSatuan', 'GeneralController::otoritasSatuan');
         $routes->post('general/setOtoritasSatuan', 'GeneralController::setOtoritasSatuan');
+        // Otoritas Produk
+        $routes->get('general/otoritasProduk', 'GeneralController::otoritasProduk');
+        $routes->post('general/setOtoritasProduk', 'GeneralController::setOtoritasProduk');
 
         // Master Kategori
         $routes->get('categories', 'CategoryController::index');
@@ -100,6 +103,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         // Input Penjualan
         $routes->get('penjualan', 'PenjualanController::index');
         $routes->post('penjualan/store', 'PenjualanController::store');
+        // Penjualan
+        $routes->get('penjualan/dashboard', 'PenjualanController::dashboard');
     });
 });
 

@@ -42,6 +42,29 @@
                         <input type="number" name="stock" class="form-control" value="<?= esc($product['stock']) ?>" required>
                     </div>
                     
+                    <div class="form-group">
+                        <label>Satuan</label>
+                        <select name="satuan_id" class="form-control">
+                            <option value="">-- Pilih Satuan --</option>
+                            <?php foreach ($satuans as $satuan): ?>
+                            <option value="<?= $satuan['id'] ?>" <?= ($satuan['id'] == ($product['satuan_id'] ?? '')) ? 'selected' : '' ?>>
+                                <?= esc($satuan['name']) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis</label>
+                        <select name="jenis_id" class="form-control">
+                            <option value="">-- Pilih Jenis --</option>
+                            <?php foreach ($jenis as $j): ?>
+                            <option value="<?= $j['id'] ?>" <?= ($j['id'] == ($product['jenis_id'] ?? '')) ? 'selected' : '' ?>>
+                                <?= esc($j['name']) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
                     <a href="<?= site_url('products') ?>" class="btn btn-secondary">Kembali</a>
                     <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </form>
