@@ -20,10 +20,14 @@
             </div>
         <?php endif; ?>
         <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <button class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#addPelengkapModal">
+                    <i class="fas fa-plus mr-1"></i>Tambah Pelengkap
+                </button>
+            </div>
             <div class="card-body">
-                <a href="<?= site_url('pelengkap/create') ?>" class="btn btn-primary mb-3">Tambah Pelengkap</a>
-                <table class="table table-bordered table-striped">
-                    <thead>
+                <table id="pelengkapTable" class="table table-bordered table-striped">
+                    <thead> 
                         <tr>
                             <th>ID</th>
                             <th>Nama Pelengkap</th>
@@ -38,12 +42,17 @@
                                 <td><?= $row['id'] ?></td>
                                 <td><?= esc($row['name']) ?></td>
                                 <td><?= esc($row['description']) ?></td>
-                                <td><?= $row['otoritas'] === 'T' ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-secondary">Nonaktif</span>' ?></td>
+                                <td><?= ($row['otoritas'] ?? null) === 'T' ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-secondary">Nonaktif</span>' ?></td>
                                 <td>
-                                    <a href="<?= site_url('pelengkap/' . $row['id'] . '/edit') ?>" class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="<?= site_url('pelengkap/' . $row['id']) ?>" method="post" style="display:inline-block;">
+                                    <a href="<?= site_url('pelengkap/' . $row['id'] . '/edit') ?>" class="btn btn-sm btn-warning" onclick="return cekOtoritasPelengkap(event, '<?= $row['otoritas'] ?? '' ?>');">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="<?= site_url('pelengkap/' . $row['id']) ?>" method="post" class="d-inline" onsubmit="return cekOtoritasPelengkap(null, '<?= $row['otoritas'] ?? '' ?>');">
+                                        <?= csrf_field() ?>
                                         <input type="hidden" name="_method" value="DELETE">
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus data ini?')">Hapus</button>
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
@@ -52,6 +61,48 @@
                 </table>
             </div>
         </div>
+    <!-- Modal Tambah Pelengkap -->
+    <div class="modal fade" id="addPelengkapModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="<?= site_url('pelengkap/create') ?>" method="post">
+                    <?= csrf_field() ?>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tambah Pelengkap Baru</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Nama Pelengkap</label>
+                            <input type="text" name="name" class="form-control" required value="<?= old('name') ?>">
+                        </div>
+                        <div class="form-group">
+                            <label>Deskripsi</label>
+                            <textarea name="description" class="form-control" rows="3"><?= old('description') ?></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-</section>
-<?= $this->endSection() ?>
+
+    <?= $this->endSection() ?>
+
+    <?= $this->section('scripts') ?>
+    <script>
+        function cekOtoritasPelengkap(event, otoritas) {
+            if (!otoritas) {
+                alert('Akses edit/delete pelengkap ini membutuhkan otoritas dari departemen yang berwenang. Silakan minta otoritas terlebih dahulu.');
+                if (event) event.preventDefault();
+                return false;
+            }
+            return true;
+        }
+        $(function() {
+            $("#pelengkapTable").DataTable();
+        });
+    </script>
+    <?= $this->endSection() ?>

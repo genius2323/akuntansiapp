@@ -80,8 +80,8 @@ class CategoryController extends BaseController
     {
 
         $rules = [
-            'kode_cat' => 'required|alpha_numeric|max_length[4]|is_unique[categories.kode_cat]',
-            'name' => 'required|min_length[3]|is_unique[categories.name]'
+            'kode_cat' => 'required|alpha_numeric|max_length[4]',
+            'name' => 'required|min_length[3]'
         ];
 
         if (!$this->validate($rules)) {
@@ -138,8 +138,8 @@ class CategoryController extends BaseController
         }
 
         $rules = [
-            'kode_cat' => 'required|alpha_numeric|max_length[4]|is_unique[categories.kode_cat,id,{id}]',
-            'name' => 'required|min_length[3]|is_unique[categories.name,id,{id}]'
+            'kode_cat' => 'required|alpha_numeric|max_length[4]',
+            'name' => 'required|min_length[3]'
         ];
         $dataToUpdate = [
             'kode_cat'    => $this->request->getPost('kode_cat'),

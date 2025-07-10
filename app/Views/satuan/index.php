@@ -17,7 +17,8 @@
                 <button type="button" class="close" data-dismiss="alert">×</button>
                 <?= session('success') ?>
             </div>
-        <?php elseif (session('error')): ?>
+        <?php endif; ?>
+        <?php if (session('error')): ?>
             <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert">×</button>
                 <?= session('error') ?>
@@ -37,21 +38,19 @@
         <?php endif; ?>
 
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Daftar Satuan</h3>
-                <div class="card-tools">
-                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addModal">
-                        <i class="fas fa-plus mr-1"></i>Tambah Satuan
-                    </button>
-                </div>
+            <div class="card-header d-flex align-items-center">
+                <button class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#addSatuanModal">
+                    <i class="fas fa-plus mr-1"></i>Tambah Satuan
+                </button>
             </div>
             <div class="card-body">
-                <table id="dataTable" class="table table-bordered table-striped">
+                <table id="satuanTable" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Nama Satuan</th>
                             <th>Deskripsi</th>
+                            <th>Otoritas</th>
                             <th width="15%">Aksi</th>
                         </tr>
                     </thead>
@@ -61,14 +60,15 @@
                                 <td><?= $satuan['id'] ?></td>
                                 <td><?= esc($satuan['name']) ?></td>
                                 <td><?= esc($satuan['description']) ?></td>
+                                <td><?= ($satuan['otoritas'] ?? null) === 'T' ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-secondary">Nonaktif</span>' ?></td>
                                 <td>
-                                    <a href="<?= site_url('satuan/' . $satuan['id'] . '/edit') ?>" class="btn btn-sm btn-warning">
+                                    <a href="<?= site_url('satuan/' . $satuan['id'] . '/edit') ?>" class="btn btn-sm btn-warning" onclick="return cekOtoritasSatuan(event, '<?= $satuan['otoritas'] ?? '' ?>');">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="<?= site_url('satuan/' . $satuan['id']) ?>" method="post" class="d-inline">
+                                    <form action="<?= site_url('satuan/' . $satuan['id']) ?>" method="post" class="d-inline" onsubmit="return cekOtoritasSatuan(event, '<?= $satuan['otoritas'] ?? '' ?>');">
                                         <?= csrf_field() ?>
                                         <input type="hidden" name="_method" value="DELETE">
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        <button type="submit" class="btn btn-sm btn-danger">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -83,7 +83,7 @@
 </section>
 
 <!-- Modal Tambah -->
-<div class="modal fade" id="addModal" tabindex="-1">
+<div class="modal fade" id="addSatuanModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="<?= site_url('satuan/create') ?>" method="post">
@@ -114,8 +114,16 @@
 
 <?= $this->section('scripts') ?>
 <script>
+    function cekOtoritasSatuan(event, otoritas) {
+        if (otoritas !== 'T') {
+            alert('Akses edit/delete satuan ini membutuhkan otoritas dari departemen yang berwenang. Silakan minta otoritas terlebih dahulu.');
+            if (event) event.preventDefault();
+            return false;
+        }
+        return true;
+    }
     $(function() {
-        $('#dataTable').DataTable();
+        $('#satuanTable').DataTable();
     });
 </script>
 <?= $this->endSection() ?>

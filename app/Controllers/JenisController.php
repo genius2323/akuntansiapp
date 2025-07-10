@@ -63,7 +63,7 @@ class JenisController extends BaseController
     public function create()
     {
         $rules = [
-            'name' => 'required|min_length[3]|is_unique[jenis.name]'
+            'name' => 'required|min_length[3]'
         ];
         if (!$this->validate($rules)) {
             return redirect()->to('/jenis')->withInput()->with('errors', $this->validator->getErrors());
@@ -113,7 +113,7 @@ class JenisController extends BaseController
             }
         }
         $rules = [
-            'name' => "required|min_length[3]|is_unique[jenis.name,id,{$id}]"
+            'name' => 'required|min_length[3]'
         ];
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());

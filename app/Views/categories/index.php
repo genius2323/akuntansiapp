@@ -25,14 +25,10 @@
         <?php endif; ?>
 
         <div class="card">
-            <div class="card-header">
-                <!-- Judul tabel spesifik untuk Kategori -->
-                <h3 class="card-title">Daftar Kategori</h3>
-                <div class="card-tools">
-                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addCategoryModal">
-                        <i class="fas fa-plus mr-1"></i>Tambah Kategori
-                    </button>
-                </div>
+            <div class="card-header d-flex align-items-center">
+                <button class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#addCategoryModal">
+                    <i class="fas fa-plus mr-1"></i>Tambah Kategori
+                </button>
             </div>
             <div class="card-body">
                 <table id="categoriesTable" class="table table-bordered table-striped">
@@ -42,6 +38,7 @@
                             <th>Kode Kategori</th>
                             <th>Nama Kategori</th>
                             <th>Deskripsi</th>
+                            <th>Otoritas</th>
                             <th width="15%">Aksi</th>
                         </tr>
                     </thead>
@@ -52,11 +49,12 @@
                                 <td><?= esc($category['kode_cat'] ?? '') ?></td>
                                 <td><?= esc($category['name']) ?></td>
                                 <td><?= esc($category['description']) ?></td>
+                                <td><?= ($category['otoritas'] ?? null) === 'T' ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-secondary">Nonaktif</span>' ?></td>
                                 <td>
                                     <a href="<?= site_url('categories/' . $category['id'] . '/edit') ?>" class="btn btn-sm btn-warning" onclick="return cekOtoritasKategori(event, '<?= $category['otoritas'] ?? '' ?>');">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="<?= site_url('categories/' . $category['id']) ?>" method="post" class="d-inline" onsubmit="return cekOtoritasKategori('<?= $category['otoritas'] ?? '' ?>');">
+                                    <form action="<?= site_url('categories/' . $category['id']) ?>" method="post" class="d-inline" onsubmit="return cekOtoritasKategori(event, '<?= $category['otoritas'] ?? '' ?>');">
                                         <?= csrf_field() ?>
                                         <input type="hidden" name="_method" value="DELETE">
                                         <button type="submit" class="btn btn-sm btn-danger">

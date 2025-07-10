@@ -144,18 +144,18 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->delete('merk/(:num)', 'MerkController::delete/$1');
 
         // Master Warna Sinar
-        $routes->get('warnasinar', 'WarnaSinarController::index');
-        $routes->post('warnasinar/create', 'WarnaSinarController::create');
-        $routes->get('warnasinar/(:num)/edit', 'WarnaSinarController::edit/$1');
-        $routes->put('warnasinar/(:num)', 'WarnaSinarController::update/$1');
-        $routes->delete('warnasinar/(:num)', 'WarnaSinarController::delete/$1');
+        $routes->get('warna-sinar', 'WarnaSinarController::index');
+        $routes->post('warna-sinar/create', 'WarnaSinarController::create');
+        $routes->get('warna-sinar/(:num)/edit', 'WarnaSinarController::edit/$1');
+        $routes->put('warna-sinar/(:num)', 'WarnaSinarController::update/$1');
+        $routes->delete('warna-sinar/(:num)', 'WarnaSinarController::delete/$1');
 
         // Master Ukuran Barang
-        $routes->get('ukuranbarang', 'UkuranBarangController::index');
-        $routes->post('ukuranbarang/create', 'UkuranBarangController::create');
-        $routes->get('ukuranbarang/(:num)/edit', 'UkuranBarangController::edit/$1');
-        $routes->put('ukuranbarang/(:num)', 'UkuranBarangController::update/$1');
-        $routes->delete('ukuranbarang/(:num)', 'UkuranBarangController::delete/$1');
+        $routes->get('ukuran-barang', 'UkuranBarangController::index');
+        $routes->post('ukuran-barang/create', 'UkuranBarangController::create');
+        $routes->get('ukuran-barang/(:num)/edit', 'UkuranBarangController::edit/$1');
+        $routes->put('ukuran-barang/(:num)', 'UkuranBarangController::update/$1');
+        $routes->delete('ukuran-barang/(:num)', 'UkuranBarangController::delete/$1');
 
         // Master Voltase
         $routes->get('voltase', 'VoltaseController::index');
@@ -172,18 +172,18 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->delete('dimensi/(:num)', 'DimensiController::delete/$1');
 
         // Master Warna Body
-        $routes->get('warnabody', 'WarnaBodyController::index');
-        $routes->post('warnabody/create', 'WarnaBodyController::create');
-        $routes->get('warnabody/(:num)/edit', 'WarnaBodyController::edit/$1');
-        $routes->put('warnabody/(:num)', 'WarnaBodyController::update/$1');
-        $routes->delete('warnabody/(:num)', 'WarnaBodyController::delete/$1');
+        $routes->get('warna-body', 'WarnaBodyController::index');
+        $routes->post('warna-body/create', 'WarnaBodyController::create');
+        $routes->get('warna-body/(:num)/edit', 'WarnaBodyController::edit/$1');
+        $routes->put('warna-body/(:num)', 'WarnaBodyController::update/$1');
+        $routes->delete('warna-body/(:num)', 'WarnaBodyController::delete/$1');
 
         // Master Warna Bibir
-        $routes->get('warnabibir', 'WarnaBibirController::index');
-        $routes->post('warnabibir/create', 'WarnaBibirController::create');
-        $routes->get('warnabibir/(:num)/edit', 'WarnaBibirController::edit/$1');
-        $routes->put('warnabibir/(:num)', 'WarnaBibirController::update/$1');
-        $routes->delete('warnabibir/(:num)', 'WarnaBibirController::delete/$1');
+        $routes->get('warna-bibir', 'WarnaBibirController::index');
+        $routes->post('warna-bibir/create', 'WarnaBibirController::create');
+        $routes->get('warna-bibir/(:num)/edit', 'WarnaBibirController::edit/$1');
+        $routes->put('warna-bibir/(:num)', 'WarnaBibirController::update/$1');
+        $routes->delete('warna-bibir/(:num)', 'WarnaBibirController::delete/$1');
 
         // Master Kaki
         $routes->get('kaki', 'KakiController::index');
