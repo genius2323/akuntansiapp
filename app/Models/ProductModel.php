@@ -35,6 +35,7 @@ class ProductModel extends Model
         'price',
         'stock',
         'otoritas', // tambahkan kolom otoritas di tabel products
+        'kode_ky',   // untuk pencatatan user login
     ];
 
     protected $useTimestamps = true;

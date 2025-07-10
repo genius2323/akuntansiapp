@@ -61,6 +61,7 @@ class WarnaSinarController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[warna_sinar.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/warna-sinar')->withInput()->with('errors', $this->validator->getErrors());
@@ -68,6 +69,7 @@ class WarnaSinarController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getWarnaSinarModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -124,6 +126,13 @@ class WarnaSinarController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (warna_sinar update) failed: ' . $e->getMessage());
         }
+        // Update kode_ky setelah update data
+        $this->getWarnaSinarModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getWarnaSinarModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (warna_sinar kode_ky update) failed: ' . $e->getMessage());
+        }
         $this->getWarnaSinarModel('default')->update($id, ['otoritas' => null]);
         try {
             $this->getWarnaSinarModel('db1')->update($id, ['otoritas' => null]);
@@ -159,6 +168,13 @@ class WarnaSinarController extends BaseController
             $this->getWarnaSinarModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (warna_sinar delete) failed: ' . $e->getMessage());
+        }
+        // Update kode_ky setelah soft delete
+        $this->getWarnaSinarModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getWarnaSinarModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (warna_sinar kode_ky update after delete) failed: ' . $e->getMessage());
         }
         $this->getWarnaSinarModel('default')->update($id, ['otoritas' => null]);
         try {

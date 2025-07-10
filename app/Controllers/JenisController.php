@@ -62,6 +62,7 @@ class JenisController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = [
             'name' => 'required|min_length[3]'
         ];
@@ -71,6 +72,7 @@ class JenisController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getJenisModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -128,6 +130,13 @@ class JenisController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (jenis update) failed: ' . $e->getMessage());
         }
+        // Update kode_ky setelah update data
+        $this->getJenisModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getJenisModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (jenis kode_ky update) failed: ' . $e->getMessage());
+        }
         $this->getJenisModel('default')->update($id, ['otoritas' => null]);
         try {
             $this->getJenisModel('db1')->update($id, ['otoritas' => null]);
@@ -164,6 +173,13 @@ class JenisController extends BaseController
             $this->getJenisModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (jenis delete) failed: ' . $e->getMessage());
+        }
+        // Update kode_ky setelah soft delete
+        $this->getJenisModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getJenisModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (jenis kode_ky update after delete) failed: ' . $e->getMessage());
         }
         $this->getJenisModel('default')->update($id, ['otoritas' => null]);
         try {

@@ -64,6 +64,7 @@ class DimensiController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[dimensi.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/dimensi')->withInput()->with('errors', $this->validator->getErrors());
@@ -71,6 +72,7 @@ class DimensiController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getDimensiModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -127,6 +129,13 @@ class DimensiController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (dimensi update) failed: ' . $e->getMessage());
         }
+        // Update kode_ky setelah update data
+        $this->getDimensiModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getDimensiModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (dimensi kode_ky update) failed: ' . $e->getMessage());
+        }
         $this->getDimensiModel('default')->update($id, ['otoritas' => null]);
         try {
             $this->getDimensiModel('db1')->update($id, ['otoritas' => null]);
@@ -162,6 +171,13 @@ class DimensiController extends BaseController
             $this->getDimensiModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (dimensi delete) failed: ' . $e->getMessage());
+        }
+        // Update kode_ky setelah soft delete
+        $this->getDimensiModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getDimensiModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (dimensi kode_ky update after delete) failed: ' . $e->getMessage());
         }
         $this->getDimensiModel('default')->update($id, ['otoritas' => null]);
         try {

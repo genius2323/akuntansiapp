@@ -19,6 +19,17 @@
                 <?= session('error') ?>
             </div>
         <?php endif; ?>
+        <?php if (session('errors')): ?>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <p class="mb-0"><strong>Terdapat kesalahan validasi:</strong></p>
+                <ul>
+                    <?php foreach (session('errors') as $error): ?>
+                        <li><?= esc($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
         <div class="card">
             <div class="card-header d-flex align-items-center">
                 <button class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#addPelengkapModal">
@@ -27,13 +38,13 @@
             </div>
             <div class="card-body">
                 <table id="pelengkapTable" class="table table-bordered table-striped">
-                    <thead> 
+                    <thead>
                         <tr>
                             <th>ID</th>
                             <th>Nama Pelengkap</th>
                             <th>Deskripsi</th>
                             <th>Otoritas</th>
-                            <th>Aksi</th>
+                            <th width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,7 +58,7 @@
                                     <a href="<?= site_url('pelengkap/' . $row['id'] . '/edit') ?>" class="btn btn-sm btn-warning" onclick="return cekOtoritasPelengkap(event, '<?= $row['otoritas'] ?? '' ?>');">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="<?= site_url('pelengkap/' . $row['id']) ?>" method="post" class="d-inline" onsubmit="return cekOtoritasPelengkap(null, '<?= $row['otoritas'] ?? '' ?>');">
+                                    <form action="<?= site_url('pelengkap/' . $row['id']) ?>" method="post" class="d-inline" onsubmit="return cekOtoritasPelengkap(event, '<?= $row['otoritas'] ?? '' ?>');">
                                         <?= csrf_field() ?>
                                         <input type="hidden" name="_method" value="DELETE">
                                         <button type="submit" class="btn btn-sm btn-danger">
@@ -89,20 +100,23 @@
         </div>
     </div>
 
-    <?= $this->endSection() ?>
+</section>
 
-    <?= $this->section('scripts') ?>
-    <script>
-        function cekOtoritasPelengkap(event, otoritas) {
-            if (!otoritas) {
-                alert('Akses edit/delete pelengkap ini membutuhkan otoritas dari departemen yang berwenang. Silakan minta otoritas terlebih dahulu.');
-                if (event) event.preventDefault();
-                return false;
-            }
-            return true;
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+    function cekOtoritasPelengkap(event, otoritas) {
+        if (!otoritas) {
+            alert('Akses edit/delete pelengkap ini membutuhkan otoritas dari departemen yang berwenang. Silakan minta otoritas terlebih dahulu.');
+            if (event) event.preventDefault();
+            return false;
         }
-        $(function() {
-            $("#pelengkapTable").DataTable();
-        });
-    </script>
-    <?= $this->endSection() ?>
+        return true;
+    }
+    $(function() {
+        $('#pelengkapTable').DataTable();
+    });
+</script>
+<?= $this->endSection() ?>
+</section>

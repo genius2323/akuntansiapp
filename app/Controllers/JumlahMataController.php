@@ -69,6 +69,7 @@ class JumlahMataController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[jumlah_mata.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/jumlah-mata')->withInput()->with('errors', $this->validator->getErrors());
@@ -76,6 +77,7 @@ class JumlahMataController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getJumlahMataModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -125,6 +127,7 @@ class JumlahMataController extends BaseController
         $dataToUpdate = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $this->getJumlahMataModel('default')->update($id, $dataToUpdate);
         try {
@@ -162,8 +165,10 @@ class JumlahMataController extends BaseController
                 return redirect()->to('/jumlah-mata')->with('error', 'Hapus hanya diizinkan sampai batas tanggal yang ditentukan.');
             }
         }
+        $this->getJumlahMataModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
         $this->getJumlahMataModel('default')->delete($id);
         try {
+            $this->getJumlahMataModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
             $this->getJumlahMataModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (jumlah_mata delete) failed: ' . $e->getMessage());

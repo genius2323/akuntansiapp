@@ -65,6 +65,7 @@ class WarnaBodyController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[warna_body.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/warna-body')->withInput()->with('errors', $this->validator->getErrors());
@@ -72,6 +73,7 @@ class WarnaBodyController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getWarnaBodyModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -128,6 +130,13 @@ class WarnaBodyController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (warna_body update) failed: ' . $e->getMessage());
         }
+        // Update kode_ky setelah update data
+        $this->getWarnaBodyModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getWarnaBodyModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (warna_body kode_ky update) failed: ' . $e->getMessage());
+        }
         $this->getWarnaBodyModel('default')->update($id, ['otoritas' => null]);
         try {
             $this->getWarnaBodyModel('db1')->update($id, ['otoritas' => null]);
@@ -163,6 +172,13 @@ class WarnaBodyController extends BaseController
             $this->getWarnaBodyModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (warna_body delete) failed: ' . $e->getMessage());
+        }
+        // Update kode_ky setelah soft delete
+        $this->getWarnaBodyModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getWarnaBodyModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (warna_body kode_ky update after delete) failed: ' . $e->getMessage());
         }
         $this->getWarnaBodyModel('default')->update($id, ['otoritas' => null]);
         try {

@@ -68,6 +68,7 @@ class FitingController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[fiting.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/fiting')->withInput()->with('errors', $this->validator->getErrors());
@@ -75,6 +76,7 @@ class FitingController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getFitingModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -126,8 +128,11 @@ class FitingController extends BaseController
             'description' => $this->request->getPost('description'),
         ];
         $this->getFitingModel('default')->update($id, $dataToUpdate);
+        // Update kode_ky setelah update data
+        $this->getFitingModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
         try {
             $this->getFitingModel('db1')->update($id, $dataToUpdate);
+            $this->getFitingModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (fiting update) failed: ' . $e->getMessage());
         }
@@ -160,6 +165,13 @@ class FitingController extends BaseController
             if ($created > $batas) {
                 return redirect()->to('/fiting')->with('error', 'Hapus hanya diizinkan sampai batas tanggal yang ditentukan.');
             }
+        }
+        // Update kode_ky sebelum soft delete
+        $this->getFitingModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getFitingModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (fiting kode_ky update before delete) failed: ' . $e->getMessage());
         }
         $this->getFitingModel('default')->delete($id);
         try {

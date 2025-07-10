@@ -11,14 +11,13 @@ class AuthFilter implements FilterInterface
         if (!session()->get('logged_in')) {
             return redirect()->to('/login');
         }
-        
         // Check department access
         if (!empty($arguments)) {
             $allowedDepartments = $arguments;
             $userDepartment = session()->get('department_id');
-            
             if (!in_array($userDepartment, $allowedDepartments)) {
-                return redirect()->to('/dashboard')->with('error', 'Unauthorized access');
+                // Redirect ke login jika tidak punya akses, hindari loop
+                return redirect()->to('/login')->with('error', 'Unauthorized access');
             }
         }
     }

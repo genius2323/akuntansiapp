@@ -63,6 +63,7 @@ class VoltaseController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[voltase.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/voltase')->withInput()->with('errors', $this->validator->getErrors());
@@ -70,6 +71,7 @@ class VoltaseController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getVoltaseModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -126,6 +128,13 @@ class VoltaseController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (voltase update) failed: ' . $e->getMessage());
         }
+        // Update kode_ky setelah update data
+        $this->getVoltaseModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getVoltaseModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (voltase kode_ky update) failed: ' . $e->getMessage());
+        }
         $this->getVoltaseModel('default')->update($id, ['otoritas' => null]);
         try {
             $this->getVoltaseModel('db1')->update($id, ['otoritas' => null]);
@@ -161,6 +170,13 @@ class VoltaseController extends BaseController
             $this->getVoltaseModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (voltase delete) failed: ' . $e->getMessage());
+        }
+        // Update kode_ky setelah soft delete
+        $this->getVoltaseModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getVoltaseModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (voltase kode_ky update after delete) failed: ' . $e->getMessage());
         }
         $this->getVoltaseModel('default')->update($id, ['otoritas' => null]);
         try {

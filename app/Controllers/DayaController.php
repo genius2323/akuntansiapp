@@ -69,6 +69,7 @@ class DayaController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[daya.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/daya')->withInput()->with('errors', $this->validator->getErrors());
@@ -76,6 +77,7 @@ class DayaController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getDayaModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -127,8 +129,11 @@ class DayaController extends BaseController
             'description' => $this->request->getPost('description'),
         ];
         $this->getDayaModel('default')->update($id, $dataToUpdate);
+        // Update kode_ky setelah update data
+        $this->getDayaModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
         try {
             $this->getDayaModel('db1')->update($id, $dataToUpdate);
+            $this->getDayaModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (daya update) failed: ' . $e->getMessage());
         }
@@ -161,6 +166,13 @@ class DayaController extends BaseController
             if ($created > $batas) {
                 return redirect()->to('/daya')->with('error', 'Hapus hanya diizinkan sampai batas tanggal yang ditentukan.');
             }
+        }
+        // Update kode_ky sebelum soft delete
+        $this->getDayaModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getDayaModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (daya kode_ky update before delete) failed: ' . $e->getMessage());
         }
         $this->getDayaModel('default')->delete($id);
         try {

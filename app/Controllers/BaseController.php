@@ -29,6 +29,13 @@ abstract class BaseController extends Controller
     protected $request;
 
     /**
+     * Instance of the session object.
+     *
+     * @var \CodeIgniter\Session\Session
+     */
+    protected $session;
+
+    /**
      * An array of helpers to be loaded automatically upon
      * class instantiation. These helpers will be available
      * to all other controllers that extend BaseController.
@@ -51,8 +58,7 @@ abstract class BaseController extends Controller
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
 
-        // Preload any models, libraries, etc, here.
-
-        // E.g.: $this->session = service('session');
+        // Pastikan session CodeIgniter aktif di semua controller
+        $this->session = service('session');
     }
 }

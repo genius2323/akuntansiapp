@@ -13,9 +13,7 @@ class AuthController extends BaseController
          $this->userModel = new UserModel();
         $this->departmentModel = new DepartmentModel();
         
-        if (session_status() === PHP_SESSION_NONE) {
-            session()->start();
-        }
+        // Tidak perlu session()->start() manual, session sudah otomatis diinisialisasi oleh BaseController
     }
 
     public function login()
@@ -77,12 +75,15 @@ class AuthController extends BaseController
                 ->with('error', 'Username/password salah atau departemen tidak sesuai');
         }
 
+
         session()->set([
             'user_id' => $user['id'],
             'username' => $user['username'],
             'department_id' => $user['department_id'],
+            'kode_ky' => $user['kode_ky'],
             'logged_in' => true
         ]);
+        // Log debug dihapus setelah verifikasi sukses
 
         log_message('info', 'User logged in: '.$user['username']);
         return redirect()->to($this->getDashboardPath($user['department_id']));
@@ -110,19 +111,9 @@ class AuthController extends BaseController
     {
         try {
             session()->destroy();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                config('App')->cookiePath,
-                config('App')->cookieDomain,
-                config('App')->cookieSecure,
-                config('App')->cookieHTTPOnly
-            );
         } catch (\Exception $e) {
             log_message('error', 'Logout error: ' . $e->getMessage());
         }
-
         return redirect()->to('/login');
     }
 }

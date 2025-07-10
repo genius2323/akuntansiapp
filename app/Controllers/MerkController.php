@@ -66,6 +66,7 @@ class MerkController extends BaseController
      */
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[merk.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/merk')->withInput()->with('errors', $this->validator->getErrors());
@@ -73,6 +74,7 @@ class MerkController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getMerkModel('default');
         if ($mainModel->save($dataToSave)) {

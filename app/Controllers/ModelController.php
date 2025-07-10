@@ -67,6 +67,7 @@ class ModelController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[model.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/model')->withInput()->with('errors', $this->validator->getErrors());
@@ -74,6 +75,7 @@ class ModelController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getModelModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -123,6 +125,7 @@ class ModelController extends BaseController
         $dataToUpdate = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $this->getModelModel('default')->update($id, $dataToUpdate);
         try {
@@ -160,8 +163,10 @@ class ModelController extends BaseController
                 return redirect()->to('/model')->with('error', 'Hapus hanya diizinkan sampai batas tanggal yang ditentukan.');
             }
         }
+        $this->getModelModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
         $this->getModelModel('default')->delete($id);
         try {
+            $this->getModelModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
             $this->getModelModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (model delete) failed: ' . $e->getMessage());

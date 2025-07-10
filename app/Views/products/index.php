@@ -29,9 +29,9 @@
         
         <div class="card">
             <div class="card-header">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addProductModal">
+                <a href="<?= site_url('products/create') ?>" class="btn btn-primary">
                     <i class="fas fa-plus mr-2"></i>Tambah Produk
-                </button>
+                </a>
             </div>
             <div class="card-body">
                 <table id="productsTable" class="table table-bordered table-striped">
@@ -73,64 +73,7 @@
     </div>
 </section>
 
-<!-- Modal Tambah Produk (tidak ada perubahan) -->
-<div class="modal fade" id="addProductModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="<?= site_url('products/create') ?>" method="post">
-                <?= csrf_field() ?>
-                <div class="modal-header">
-                    <h5 class="modal-title">Tambah Produk Baru</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Nama Produk</label>
-                        <input type="text" name="name" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Kategori</label>
-                        <select name="category_id" class="form-control" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            <?php foreach ($categories as $category): ?>
-                            <option value="<?= $category['id'] ?>"><?= esc($category['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Harga</label>
-                        <input type="number" name="price" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Stok</label>
-                        <input type="number" name="stock" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Satuan</label>
-                        <select name="satuan_id" class="form-control">
-                            <option value="">-- Pilih Satuan --</option>
-                            <?php foreach ($satuans as $satuan): ?>
-                            <option value="<?= $satuan['id'] ?>"><?= esc($satuan['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Jenis</label>
-                        <select name="jenis_id" class="form-control">
-                            <option value="">-- Pilih Jenis --</option>
-                            <?php foreach ($jenis as $j): ?>
-                            <option value="<?= $j['id'] ?>"><?= esc($j['name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<!-- Modal Tambah Produk dihapus, gunakan halaman khusus create produk -->
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>

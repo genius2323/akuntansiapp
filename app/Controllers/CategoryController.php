@@ -88,10 +88,15 @@ class CategoryController extends BaseController
             return redirect()->to('/categories')->withInput()->with('errors', $this->validator->getErrors());
         }
 
+
+        // DEBUG: Log session kode_ky
+        log_message('debug', 'Session kode_ky on create: ' . print_r(session('kode_ky'), true));
+
         $dataToSave = [
             'kode_cat'    => $this->request->getPost('kode_cat'),
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
 
         $mainModel = $this->getCategoryModel('default');
@@ -158,7 +163,13 @@ class CategoryController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (category update) failed: ' . $e->getMessage());
         }
-
+        // Update kode_ky setelah update data
+        $this->getCategoryModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getCategoryModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (category kode_ky update) failed: ' . $e->getMessage());
+        }
         // Kosongkan kolom otoritas setelah update
         $this->getCategoryModel('default')->update($id, ['otoritas' => null]);
         try {
@@ -166,7 +177,6 @@ class CategoryController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (category otoritas clear) failed: ' . $e->getMessage());
         }
-
         return redirect()->to('/categories')->with('success', 'Kategori berhasil diperbarui.');
     }
 
@@ -192,13 +202,19 @@ class CategoryController extends BaseController
                 return redirect()->to('/categories')->with('error', 'Hapus hanya diizinkan sampai batas tanggal yang ditentukan.');
             }
         }
+        // Update kode_ky sebelum soft delete
+        $this->getCategoryModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getCategoryModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (category kode_ky update before delete) failed: ' . $e->getMessage());
+        }
         $this->getCategoryModel('default')->delete($id);
         try {
             $this->getCategoryModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (category delete) failed: ' . $e->getMessage());
         }
-
         // Kosongkan kolom otoritas setelah delete (jika soft delete, update data; jika hard delete, ini bisa di-skip)
         $this->getCategoryModel('default')->update($id, ['otoritas' => null]);
         try {
@@ -206,7 +222,6 @@ class CategoryController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (category otoritas clear after delete) failed: ' . $e->getMessage());
         }
-
         return redirect()->to('/categories')->with('success', 'Kategori berhasil dihapus dari kedua database.');
     }
 }

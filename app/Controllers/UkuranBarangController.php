@@ -62,6 +62,7 @@ class UkuranBarangController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[ukuran_barang.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/ukuran-barang')->withInput()->with('errors', $this->validator->getErrors());
@@ -69,6 +70,7 @@ class UkuranBarangController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getUkuranBarangModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -125,6 +127,13 @@ class UkuranBarangController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (ukuran_barang update) failed: ' . $e->getMessage());
         }
+        // Update kode_ky setelah update data
+        $this->getUkuranBarangModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getUkuranBarangModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (ukuran_barang kode_ky update) failed: ' . $e->getMessage());
+        }
         $this->getUkuranBarangModel('default')->update($id, ['otoritas' => null]);
         try {
             $this->getUkuranBarangModel('db1')->update($id, ['otoritas' => null]);
@@ -160,6 +169,13 @@ class UkuranBarangController extends BaseController
             $this->getUkuranBarangModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (ukuran_barang delete) failed: ' . $e->getMessage());
+        }
+        // Update kode_ky setelah soft delete
+        $this->getUkuranBarangModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getUkuranBarangModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (ukuran_barang kode_ky update after delete) failed: ' . $e->getMessage());
         }
         $this->getUkuranBarangModel('default')->update($id, ['otoritas' => null]);
         try {

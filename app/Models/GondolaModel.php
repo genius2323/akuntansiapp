@@ -8,7 +8,7 @@ class GondolaModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
-    protected $allowedFields    = ['name', 'description', 'otoritas', 'batas_tanggal_sistem', 'mode_batas_tanggal'];
+    protected $allowedFields    = ['name', 'description', 'otoritas', 'kode_ky', 'batas_tanggal_sistem', 'mode_batas_tanggal'];
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';

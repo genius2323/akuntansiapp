@@ -67,6 +67,7 @@ class KakiController extends BaseController
 
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[kaki.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/kaki')->withInput()->with('errors', $this->validator->getErrors());
@@ -74,6 +75,7 @@ class KakiController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getKakiModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -130,6 +132,13 @@ class KakiController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (kaki update) failed: ' . $e->getMessage());
         }
+        // Update kode_ky setelah update data
+        $this->getKakiModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getKakiModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (kaki kode_ky update) failed: ' . $e->getMessage());
+        }
         $this->getKakiModel('default')->update($id, ['otoritas' => null]);
         try {
             $this->getKakiModel('db1')->update($id, ['otoritas' => null]);
@@ -165,6 +174,13 @@ class KakiController extends BaseController
             $this->getKakiModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (kaki delete) failed: ' . $e->getMessage());
+        }
+        // Update kode_ky setelah soft delete
+        $this->getKakiModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getKakiModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (kaki kode_ky update after delete) failed: ' . $e->getMessage());
         }
         $this->getKakiModel('default')->update($id, ['otoritas' => null]);
         try {

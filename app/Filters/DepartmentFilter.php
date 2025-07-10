@@ -12,7 +12,8 @@ class DepartmentFilter implements FilterInterface
         $userDept = $session->get('department_id');
         
         if (!in_array($userDept, $arguments)) {
-            return redirect()->to('/dashboard')->with('error', 'Akses tidak diizinkan untuk departemen ini');
+            // Redirect ke login jika tidak punya akses, hindari loop
+            return redirect()->to('/login')->with('error', 'Akses tidak diizinkan untuk departemen ini');
         }
     }
 

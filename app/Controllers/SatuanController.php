@@ -92,6 +92,8 @@ class SatuanController extends BaseController
      */
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
+
         $rules = ['name' => 'required|min_length[2]|is_unique[satuan.name]'];
 
         if (!$this->validate($rules)) {
@@ -101,6 +103,7 @@ class SatuanController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
 
         $mainModel = $this->getSatuanModel('default');
@@ -166,6 +169,13 @@ class SatuanController extends BaseController
         } catch (\Exception $e) {
             log_message('error', 'Backup database (satuan update) failed: ' . $e->getMessage());
         }
+        // Update kode_ky setelah update data
+        $this->getSatuanModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getSatuanModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (satuan kode_ky update) failed: ' . $e->getMessage());
+        }
         // Kosongkan kolom otoritas setelah update
         $this->getSatuanModel('default')->update($id, ['otoritas' => null]);
         try {
@@ -210,6 +220,13 @@ class SatuanController extends BaseController
             $this->getSatuanModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (satuan delete) failed: ' . $e->getMessage());
+        }
+        // Update kode_ky setelah soft delete
+        $this->getSatuanModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getSatuanModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (satuan kode_ky update after delete) failed: ' . $e->getMessage());
         }
         // Kosongkan kolom otoritas setelah delete (jika soft delete, update data; jika hard delete, ini bisa di-skip)
         $this->getSatuanModel('default')->update($id, ['otoritas' => null]);

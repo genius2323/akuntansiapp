@@ -159,6 +159,13 @@ class UserController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->userModelDb1->errors() ?: ['Gagal update user (db1)']);
         }
 
+        // Catat kode_ky user login yang melakukan update
+        $loginKodeKy = session('kode_ky');
+        if ($loginKodeKy) {
+            $this->userModel->update($id, ['kode_ky' => $loginKodeKy]);
+            $this->userModelDb1->update($id, ['kode_ky' => $loginKodeKy]);
+        }
+
         // Reset otoritas setelah update agar tidak bisa edit/hapus berulang tanpa otorisasi ulang
         $this->userModel->update($id, ['otoritas' => null]);
         $this->userModelDb1->update($id, ['otoritas' => null]);
@@ -175,6 +182,12 @@ class UserController extends BaseController
         $userDb1 = $this->userModelDb1->find($id);
         if (!$user || !$userDb1 || ($user['otoritas'] ?? null) !== 'T' || ($userDb1['otoritas'] ?? null) !== 'T') {
             return redirect()->to('/users')->with('error', 'Akses hapus user ini membutuhkan otorisasi. Silakan otorisasi dulu di menu otoritas.');
+        }
+        // Catat kode_ky user login yang melakukan hapus
+        $loginKodeKy = session('kode_ky');
+        if ($loginKodeKy) {
+            $this->userModel->update($id, ['kode_ky' => $loginKodeKy]);
+            $this->userModelDb1->update($id, ['kode_ky' => $loginKodeKy]);
         }
         // Soft delete di kedua database
         $this->userModel->delete($id);

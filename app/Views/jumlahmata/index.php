@@ -10,13 +10,13 @@
 
         <?php if (session('success')): ?>
             <div class="alert alert-success alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert"></button>
+                <button type="button" class="close" data-dismiss="alert">×</button>
                 <?= session('success') ?>
             </div>
         <?php endif; ?>
         <?php if (session('error')): ?>
             <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert"></button>
+                <button type="button" class="close" data-dismiss="alert">×</button>
                 <?= session('error') ?>
             </div>
         <?php endif; ?>
@@ -39,13 +39,13 @@
             </div>
             <div class="card-body">
                 <table id="jumlahMataTable" class="table table-bordered table-striped">
-                    <thead> 
+                    <thead>
                         <tr>
                             <th>ID</th>
                             <th>Nama Jumlah Mata</th>
                             <th>Deskripsi</th>
                             <th>Otoritas</th>
-                            <th>Aksi</th>
+                            <th width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,10 +56,10 @@
                                 <td><?= esc($row['description']) ?></td>
                                 <td><?= ($row['otoritas'] ?? null) === 'T' ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-secondary">Nonaktif</span>' ?></td>
                                 <td>
-                                    <a href="<?= site_url('jumlahmata/' . $row['id'] . '/edit') ?>" class="btn btn-sm btn-warning" onclick="return cekOtoritasJumlahMata(event, '<?= $row['otoritas'] ?? '' ?>');">
+                                    <a href="<?= site_url('jumlah-mata/' . $row['id'] . '/edit') ?>" class="btn btn-sm btn-warning" onclick="return cekOtoritasJumlahMata(event, '<?= $row['otoritas'] ?? '' ?>');">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="<?= site_url('jumlahmata/' . $row['id']) ?>" method="post" class="d-inline" onsubmit="return cekOtoritasJumlahMata(null, '<?= $row['otoritas'] ?? '' ?>');">
+                                    <form action="<?= site_url('jumlah-mata/' . $row['id']) ?>" method="post" class="d-inline" onsubmit="return cekOtoritasJumlahMata(event, '<?= $row['otoritas'] ?? '' ?>');">
                                         <?= csrf_field() ?>
                                         <input type="hidden" name="_method" value="DELETE">
                                         <button type="submit" class="btn btn-sm btn-danger">
@@ -79,7 +79,7 @@
     <div class="modal fade" id="addJumlahMataModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="<?= site_url('jumlahmata/create') ?>" method="post">
+                <form action="<?= site_url('jumlah-mata/create') ?>" method="post">
                     <?= csrf_field() ?>
                     <div class="modal-header">
                         <h5 class="modal-title">Tambah Jumlah Mata Baru</h5>
@@ -105,19 +105,19 @@
 
     <?= $this->endSection() ?>
 
-    <?= $this->section('scripts') ?>
-    <script>
-        function cekOtoritasJumlahMata(event, otoritas) {
-            if (!otoritas) {
-                alert('Akses edit/delete jumlah mata ini membutuhkan otoritas dari departemen yang berwenang. Silakan minta otoritas terlebih dahulu.');
-                if (event) event.preventDefault();
-                return false;
-            }
-            return true;
+<?= $this->section('scripts') ?>
+<script>
+    function cekOtoritasJumlahMata(event, otoritas) {
+        if (!otoritas) {
+            alert('Akses edit/delete jumlah mata ini membutuhkan otoritas dari departemen yang berwenang. Silakan minta otoritas terlebih dahulu.');
+            if (event) event.preventDefault();
+            return false;
         }
-        $(function() {
-            $("#jumlahMataTable").DataTable();
-        });
-    </script>
-    <?= $this->endSection() ?>
+        return true;
+    }
+    $(function() {
+        $('#jumlahMataTable').DataTable();
+    });
+</script>
+<?= $this->endSection() ?>
 </section>

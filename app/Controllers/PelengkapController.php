@@ -67,6 +67,7 @@ class PelengkapController extends BaseController
      */
     public function create()
     {
+        // Log debug dihapus setelah verifikasi sukses
         $rules = ['name' => 'required|min_length[2]|is_unique[pelengkap.name]'];
         if (!$this->validate($rules)) {
             return redirect()->to('/pelengkap')->withInput()->with('errors', $this->validator->getErrors());
@@ -74,6 +75,7 @@ class PelengkapController extends BaseController
         $dataToSave = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $mainModel = $this->getPelengkapModel('default');
         if ($mainModel->save($dataToSave)) {
@@ -127,6 +129,7 @@ class PelengkapController extends BaseController
         $dataToUpdate = [
             'name'        => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
+            'kode_ky'     => session('kode_ky'),
         ];
         $this->getPelengkapModel('default')->update($id, $dataToUpdate);
         try {
@@ -168,8 +171,10 @@ class PelengkapController extends BaseController
                 return redirect()->to('/pelengkap')->with('error', 'Hapus hanya diizinkan sampai batas tanggal yang ditentukan.');
             }
         }
+        $this->getPelengkapModel('default')->update($id, ['kode_ky' => session('kode_ky')]);
         $this->getPelengkapModel('default')->delete($id);
         try {
+            $this->getPelengkapModel('db1')->update($id, ['kode_ky' => session('kode_ky')]);
             $this->getPelengkapModel('db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (pelengkap delete) failed: ' . $e->getMessage());

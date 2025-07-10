@@ -12,7 +12,7 @@ class CategoryModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
 
-    protected $allowedFields    = ['kode_cat', 'name', 'description', 'otoritas', 'batas_tanggal_sistem', 'mode_batas_tanggal'];
+protected $allowedFields    = ['kode_cat', 'name', 'description', 'otoritas', 'batas_tanggal_sistem', 'mode_batas_tanggal', 'kode_ky'];
 
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';
