@@ -202,6 +202,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
         $routes->get('products/(:num)/edit', 'ProductController::edit/$1');
         $routes->put('products/(:num)', 'ProductController::update/$1');
         $routes->delete('products/(:num)', 'ProductController::delete/$1');
+        $routes->get('products/testInsertMinimal', 'ProductController::testInsertMinimal');
 
         // Input Penjualan
         $routes->get('penjualan', 'PenjualanController::index');

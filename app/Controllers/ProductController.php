@@ -40,115 +40,59 @@ class ProductController extends BaseController
 
     public function create()
     {
-        log_message('debug', 'MASUK CONTROLLER CREATE, METHOD: ' . $this->request->getMethod());
-        log_message('debug', 'Session ID: ' . session_id());
-        log_message('debug', 'Session on create: ' . print_r(session()->get(), true));
+        $rules = [
+            'name'        => 'required|min_length[3]',
+            'category_id' => 'required|numeric',
+            'satuan_id'   => 'required|numeric',
+            'price'       => 'required|numeric',
+            'stock'       => 'required|numeric'
+        ];
 
-
-        if ($this->request->getMethod() === 'post') {
-            // Jika POST, proses simpan produk
-            $rules = [
-                'name'        => 'required|min_length[3]',
-                'category_id' => 'required|numeric',
-                'price'       => 'required|numeric',
-                'stock'       => 'required|numeric'
-            ];
-
-            if (!$this->validate($rules)) {
-                return redirect()->to('/products/create')->withInput()->with('errors', $this->validator->getErrors());
-            }
-
-
-            $dataToSave = [
-                'name'            => $this->request->getPost('name'),
-                'category_id'     => $this->request->getPost('category_id'),
-                'satuan_id'       => $this->request->getPost('satuan_id'),
-                'jenis_id'        => $this->request->getPost('jenis_id'),
-                'pelengkap_id'    => $this->request->getPost('pelengkap_id'),
-                'gondola_id'      => $this->request->getPost('gondola_id'),
-                'merk_id'         => $this->request->getPost('merk_id'),
-                'warna_sinar_id'  => $this->request->getPost('warna_sinar_id'),
-                'ukuran_barang_id'=> $this->request->getPost('ukuran_barang_id'),
-                'voltase_id'      => $this->request->getPost('voltase_id'),
-                'dimensi_id'      => $this->request->getPost('dimensi_id'),
-                'warna_body_id'   => $this->request->getPost('warna_body_id'),
-                'warna_bibir_id'  => $this->request->getPost('warna_bibir_id'),
-                'kaki_id'         => $this->request->getPost('kaki_id'),
-                'model_id'        => $this->request->getPost('model_id'),
-                'fiting_id'       => $this->request->getPost('fiting_id'),
-                'daya_id'         => $this->request->getPost('daya_id'),
-                'jumlah_mata_id'  => $this->request->getPost('jumlah_mata_id'),
-                'price'           => $this->request->getPost('price'),
-                'stock'           => $this->request->getPost('stock'),
-                'kode_ky'         => session('kode_ky'),
-            ];
-
-            $mainModel = $this->getModel('ProductModel', 'default');
-            log_message('debug', '[PRODUK] Akan simpan ke DB utama: ' . print_r($dataToSave, true));
-            if ($mainModel->save($dataToSave)) {
-                $insertedID = $mainModel->getInsertID();
-                $dataToSave['id'] = $insertedID;
-                log_message('debug', '[PRODUK] Simpan ke DB utama berhasil, ID: ' . $insertedID);
-
-                $backupModel = $this->getModel('ProductModel', 'db1');
-                try {
-                    log_message('debug', '[PRODUK] Akan simpan ke DB backup: ' . print_r($dataToSave, true));
-                    $backupModel->insert($dataToSave);
-                    log_message('debug', '[PRODUK] Simpan ke DB backup berhasil');
-                } catch (\Exception $e) {
-                    $mainModel->delete($insertedID, true);
-                    log_message('error', '[PRODUK] Backup database (product) failed: ' . $e->getMessage());
-                    return redirect()->to('/products')->with('error', 'Gagal menyimpan data backup produk.');
-                }
-            } else {
-                log_message('error', '[PRODUK] Gagal simpan ke DB utama: ' . print_r($mainModel->errors(), true));
-                return redirect()->to('/products')->with('error', 'Gagal menyimpan data utama produk.');
-            }
-
-            return redirect()->to('/products')->with('success', 'Produk berhasil ditambahkan.');
+        if (!$this->validate($rules)) {
+            return redirect()->to('/products/create')->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Jika GET, tampilkan form dengan semua data master
-        $errors = session('errors') ?? [];
-        $categoryModel = $this->getModel('CategoryModel', 'default');
-        $satuanModel = $this->getModel('SatuanModel', 'default');
-        $jenisModel = $this->getModel('JenisModel', 'default');
-        $pelengkapModel = $this->getModel('PelengkapModel', 'default');
-        $gondolaModel = $this->getModel('GondolaModel', 'default');
-        $merkModel = $this->getModel('MerkModel', 'default');
-        $warnaSinarModel = $this->getModel('WarnaSinarModel', 'default');
-        $ukuranBarangModel = $this->getModel('UkuranBarangModel', 'default');
-        $voltaseModel = $this->getModel('VoltaseModel', 'default');
-        $dimensiModel = $this->getModel('DimensiModel', 'default');
-        $warnaBodyModel = $this->getModel('WarnaBodyModel', 'default');
-        $warnaBibirModel = $this->getModel('WarnaBibirModel', 'default');
-        $kakiModel = $this->getModel('KakiModel', 'default');
-        $modelModel = $this->getModel('ModelModel', 'default');
-        $fitingModel = $this->getModel('FitingModel', 'default');
-        $dayaModel = $this->getModel('DayaModel', 'default');
-        $jumlahMataModel = $this->getModel('JumlahMataModel', 'default');
-
-        $data = [
-            'categories'     => $categoryModel->findAll(),
-            'satuans'        => $satuanModel->findAll(),
-            'jenis'          => $jenisModel->findAll(),
-            'pelengkaps'     => $pelengkapModel->findAll(),
-            'gondolas'       => $gondolaModel->findAll(),
-            'merks'          => $merkModel->findAll(),
-            'warna_sinars'   => $warnaSinarModel->findAll(),
-            'ukuran_barangs' => $ukuranBarangModel->findAll(),
-            'voltases'       => $voltaseModel->findAll(),
-            'dimensis'       => $dimensiModel->findAll(),
-            'warna_bodys'    => $warnaBodyModel->findAll(),
-            'warna_bibirs'   => $warnaBibirModel->findAll(),
-            'kakis'          => $kakiModel->findAll(),
-            'models'         => $modelModel->findAll(),
-            'fitings'        => $fitingModel->findAll(),
-            'dayas'          => $dayaModel->findAll(),
-            'jumlah_matas'   => $jumlahMataModel->findAll(),
-            'errors'         => $errors,
+        $dataToSave = [
+            'name'            => $this->request->getPost('name'),
+            'category_id'     => $this->request->getPost('category_id'),
+            'satuan_id'       => $this->request->getPost('satuan_id'),
+            'jenis_id'        => $this->request->getPost('jenis_id'),
+            'pelengkap_id'    => $this->request->getPost('pelengkap_id'),
+            'gondola_id'      => $this->request->getPost('gondola_id'),
+            'merk_id'         => $this->request->getPost('merk_id'),
+            'warna_sinar_id'  => $this->request->getPost('warna_sinar_id'),
+            'ukuran_barang_id'=> $this->request->getPost('ukuran_barang_id'),
+            'voltase_id'      => $this->request->getPost('voltase_id'),
+            'dimensi_id'      => $this->request->getPost('dimensi_id'),
+            'warna_body_id'   => $this->request->getPost('warna_body_id'),
+            'warna_bibir_id'  => $this->request->getPost('warna_bibir_id'),
+            'kaki_id'         => $this->request->getPost('kaki_id'),
+            'model_id'        => $this->request->getPost('model_id'),
+            'fiting_id'       => $this->request->getPost('fiting_id'),
+            'daya_id'         => $this->request->getPost('daya_id'),
+            'jumlah_mata_id'  => $this->request->getPost('jumlah_mata_id'),
+            'price'           => $this->request->getPost('price'),
+            'stock'           => $this->request->getPost('stock'),
+            'kode_ky'         => session('kode_ky'),
+            'otoritas'        => 'T',
         ];
-        return view('products/create', $data);
+
+        $mainModel = $this->getModel('ProductModel', 'default');
+        if ($mainModel->save($dataToSave)) {
+            $insertedID = $mainModel->getInsertID();
+            $dataToSave['id'] = $insertedID;
+            $backupModel = $this->getModel('ProductModel', 'db1');
+            try {
+                $backupModel->insert($dataToSave);
+            } catch (\Exception $e) {
+                $mainModel->delete($insertedID, true);
+                log_message('error', 'Backup database (product) failed: ' . $e->getMessage());
+                return redirect()->to('/products')->with('error', 'Gagal menyimpan data backup. Data utama dibatalkan.');
+            }
+        } else {
+            return redirect()->to('/products')->with('error', 'Gagal menyimpan data utama produk.');
+        }
+        return redirect()->to('/products')->with('success', 'Produk berhasil ditambahkan di kedua database.');
     }
 
     public function edit($id)
@@ -181,70 +125,109 @@ class ProductController extends BaseController
 
     public function update($id)
     {
+        $product = $this->getModel('ProductModel', 'default')->find($id);
+        if (empty($product) || ($product['otoritas'] ?? 'F') !== 'T') {
+            return redirect()->to('/products')->with('error', 'Akses update produk ini membutuhkan otoritas dari departemen yang berwenang.');
+        }
         $rules = [
             'name'        => 'required|min_length[3]',
             'category_id' => 'required|numeric',
+            'satuan_id'   => 'required|numeric',
             'price'       => 'required|numeric',
             'stock'       => 'required|numeric'
         ];
-
         if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            return redirect()->to('/products/' . $id . '/edit')->withInput()->with('errors', $this->validator->getErrors());
         }
-
-        $product = $this->getModel('ProductModel', 'default')->find($id);
-        if (!$product) {
-            return redirect()->to('/products')->with('error', 'Produk tidak ditemukan.');
-        }
-
-        // Validasi otoritas produk
-        if (($product['otoritas'] ?? 'F') !== 'T') {
-            return redirect()->to('/products')->with('error', 'Edit produk hanya diizinkan jika sudah diotorisasi oleh Departemen General. Silakan minta otorisasi ke Departemen General.');
-        }
-
         $dataToUpdate = [
-            'name'        => $this->request->getPost('name'),
-            'category_id' => $this->request->getPost('category_id'),
-            'satuan_id'   => $this->request->getPost('satuan_id'),
-            'jenis_id'    => $this->request->getPost('jenis_id'),
-            'price'       => $this->request->getPost('price'),
-            'stock'       => $this->request->getPost('stock'),
-            'otoritas'    => null, // reset otoritas setelah edit
-            'kode_ky'     => session('kode_ky'),
+            'name'            => $this->request->getPost('name'),
+            'category_id'     => $this->request->getPost('category_id'),
+            'satuan_id'       => $this->request->getPost('satuan_id'),
+            'jenis_id'        => $this->request->getPost('jenis_id'),
+            'pelengkap_id'    => $this->request->getPost('pelengkap_id'),
+            'gondola_id'      => $this->request->getPost('gondola_id'),
+            'merk_id'         => $this->request->getPost('merk_id'),
+            'warna_sinar_id'  => $this->request->getPost('warna_sinar_id'),
+            'ukuran_barang_id'=> $this->request->getPost('ukuran_barang_id'),
+            'voltase_id'      => $this->request->getPost('voltase_id'),
+            'dimensi_id'      => $this->request->getPost('dimensi_id'),
+            'warna_body_id'   => $this->request->getPost('warna_body_id'),
+            'warna_bibir_id'  => $this->request->getPost('warna_bibir_id'),
+            'kaki_id'         => $this->request->getPost('kaki_id'),
+            'model_id'        => $this->request->getPost('model_id'),
+            'fiting_id'       => $this->request->getPost('fiting_id'),
+            'daya_id'         => $this->request->getPost('daya_id'),
+            'jumlah_mata_id'  => $this->request->getPost('jumlah_mata_id'),
+            'price'           => $this->request->getPost('price'),
+            'stock'           => $this->request->getPost('stock'),
+            'kode_ky'         => session('kode_ky'),
+            'otoritas'        => null,
         ];
-
         $this->getModel('ProductModel', 'default')->update($id, $dataToUpdate);
         try {
             $this->getModel('ProductModel', 'db1')->update($id, $dataToUpdate);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (product update) failed: ' . $e->getMessage());
         }
-
+        $this->getModel('ProductModel', 'default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getModel('ProductModel', 'db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (product kode_ky update) failed: ' . $e->getMessage());
+        }
+        $this->getModel('ProductModel', 'default')->update($id, ['otoritas' => null]);
+        try {
+            $this->getModel('ProductModel', 'db1')->update($id, ['otoritas' => null]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (product otoritas clear) failed: ' . $e->getMessage());
+        }
         return redirect()->to('/products')->with('success', 'Produk berhasil diperbarui.');
     }
 
     public function delete($id)
     {
         $product = $this->getModel('ProductModel', 'default')->find($id);
-        if (!$product) {
-            return redirect()->to('/products')->with('error', 'Produk tidak ditemukan.');
+        if (empty($product) || ($product['otoritas'] ?? 'F') !== 'T') {
+            return redirect()->to('/products')->with('error', 'Akses hapus produk ini membutuhkan otoritas dari departemen yang berwenang.');
         }
-        // Validasi otoritas produk
-        if (($product['otoritas'] ?? 'F') !== 'T') {
-            return redirect()->to('/products')->with('error', 'Hapus produk hanya diizinkan jika sudah diotorisasi oleh Departemen General. Silakan minta otorisasi ke Departemen General.');
+        $this->getModel('ProductModel', 'default')->update($id, ['kode_ky' => session('kode_ky')]);
+        try {
+            $this->getModel('ProductModel', 'db1')->update($id, ['kode_ky' => session('kode_ky')]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (product kode_ky update before delete) failed: ' . $e->getMessage());
         }
-        $dataToUpdate = [
-            'otoritas' => null,
-            'kode_ky'  => session('kode_ky'),
-        ]; // reset otoritas & catat user hapus
-        $this->getModel('ProductModel', 'default')->update($id, $dataToUpdate);
         $this->getModel('ProductModel', 'default')->delete($id);
         try {
-            $this->getModel('ProductModel', 'db1')->update($id, $dataToUpdate);
             $this->getModel('ProductModel', 'db1')->delete($id);
         } catch (\Exception $e) {
             log_message('error', 'Backup database (product delete) failed: ' . $e->getMessage());
         }
-        return redirect()->to('/products')->with('success', 'Produk berhasil dihapus.');
+        $this->getModel('ProductModel', 'default')->update($id, ['otoritas' => null]);
+        try {
+            $this->getModel('ProductModel', 'db1')->update($id, ['otoritas' => null]);
+        } catch (\Exception $e) {
+            log_message('error', 'Backup database (product otoritas clear after delete) failed: ' . $e->getMessage());
+        }
+        return redirect()->to('/products')->with('success', 'Produk berhasil dihapus dari kedua database.');
+    }
+
+    public function testInsertMinimal()
+    {
+        $dataToSave = [
+            'name'        => 'Produk Test Hardcode',
+            'category_id' => 1, // pastikan ID 1 ada di tabel categories
+            'satuan_id'   => 1, // pastikan ID 1 ada di tabel satuan
+            'price'       => 1000,
+            'stock'       => 10,
+            'kode_ky'     => 'test',
+            'otoritas'    => 'T',
+        ];
+        $mainModel = $this->getModel('ProductModel', 'default');
+        $backupModel = $this->getModel('ProductModel', 'db1');
+        $result = $mainModel->save($dataToSave);
+        $insertedID = $mainModel->getInsertID();
+        $dataToSave['id'] = $insertedID;
+        $resultBackup = $backupModel->insert($dataToSave);
+        echo "Insert utama: ".$result."; Insert backup: ".$resultBackup."; ID: ".$insertedID; exit;
     }
 }

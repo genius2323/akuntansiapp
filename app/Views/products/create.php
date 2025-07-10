@@ -1,4 +1,3 @@
-
 <?= $this->extend('layouts/adminlte') ?>
 
 <?= $this->section('content') ?>
@@ -31,7 +30,7 @@
         </div>
         <div class="form-group">
             <label>Harga</label>
-            <input type="number" name="price" class="form-control" value="<?= old('price') ?>" required>
+            <input type="number" name="price" class="form-control" value="<?= old('price') ?>" required min="1">
         </div>
         <div class="form-group">
             <label>Kategori</label>
@@ -53,7 +52,7 @@
         </div>
         <div class="form-group">
             <label>Satuan</label>
-            <select name="satuan_id" class="form-control">
+            <select name="satuan_id" class="form-control" required>
                 <option value="">Pilih Satuan</option>
                 <?php foreach ($satuans as $sat): ?>
                     <option value="<?= $sat['id'] ?>" <?= old('satuan_id') == $sat['id'] ? 'selected' : '' ?>><?= esc($sat['name']) ?></option>
